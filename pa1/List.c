@@ -1,0 +1,410 @@
+/*Reema Chintala
+rechinta
+PA1*/ 
+
+//-----------------------------------------------------------------------------
+// List.c
+// Implementation file for List ADT
+//-----------------------------------------------------------------------------
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include<stdbool.h>
+#include "List.h"
+
+
+// structs --------------------------------------------------------------------
+
+// private Node type
+typedef struct NodeObj* Node;
+
+// private NodeObj type
+typedef struct NodeObj{
+   ListElement data;
+   Node next;
+   Node previous;
+} NodeObj;
+
+// private ListObj type
+typedef struct ListObj{
+   Node front;
+   Node back;
+   Node cursor;
+   int length;
+   int cursorIndex;
+} ListObj;
+
+
+// Constructors-Destructors ---------------------------------------------------
+
+// newNode()
+// Returns reference to new Node object. Initializes next, previous, and data fields.
+Node newNode(ListElement data){
+   Node N = malloc(sizeof(NodeObj));
+   assert( N!=NULL );
+   N->data = data;
+   N->next = NULL;
+   N->previous = NULL; //double check
+   return(N);
+}
+
+// freeNode()
+// Frees heap memory pointed to by *pN, sets *pN to NULL.
+void freeNode(Node* pN){
+   if( pN!=NULL && *pN!=NULL ){
+      free(*pN);
+      *pN = NULL;
+   }
+}
+
+// newList()
+// Returns reference to new empty List object.
+List newList(void){
+   List L;
+   L = malloc(sizeof(ListObj));
+   assert( L!=NULL );
+   L->front = L->back = NULL;
+   L->length = 0;
+   L->cursor = NULL;
+   L->cursorIndex = -1;
+   return(L);
+}
+
+void clear(List L){
+   
+   while( length(L)>0) { 
+      L->length = 0;
+      deleteBack(L); 
+         
+   }
+   
+}
+
+
+// freeList()
+// Frees all heap memory associated with List *pL, and sets *pL to NULL.
+void freeList(List* pL){
+   if(pL!=NULL && *pL!=NULL) { 
+      clear(*pL);
+      free(*pL);
+      *pL = NULL;
+   }
+}
+
+
+
+// Access functions -----------------------------------------------------------
+
+// getFront()
+// Returns the value at the front of Q.
+// Pre: !isEmpty(Q)
+
+
+// length()
+// Returns the length of L.
+int length(List L){
+   if( L==NULL ){
+      printf("List Error: calling length() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   return(L->length);
+}
+
+// Returns index of cursor element if defined, -1 otherwise.
+int index(List L){
+   if ((L->cursor) == NULL){
+      return -1;
+   }
+   return L->cursorIndex;
+}
+
+
+
+
+// Returns front element of L. Pre: length()>0
+int front(List L){
+   if( L==NULL ){
+      printf("List Error: calling front() on NULL LIST reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if(length(L) <= 0){
+      printf("List Error: calling front() on empty List\n");
+      exit(EXIT_FAILURE);
+   }
+   return L->front->data;
+}
+
+
+// Returns back element of L. Pre: length()>0
+
+int back(List L){
+   if( L==NULL ){
+      printf("List Error: calling back() on NULL LIST reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if(length(L) <= 0){
+      printf("List Error: calling back() on empty List\n");
+      exit(EXIT_FAILURE);
+   }
+   return L->back->data;
+}
+
+// Returns cursor element of L. Pre: length()>0, index()>=0
+int get(List L){
+   if(length(L) <= 0 || ((L->cursorIndex)<0)){
+      printf("List Error: calling get() on NULL cursor\n");
+      exit(EXIT_FAILURE);
+   }
+   return L->cursor->data;
+}
+
+// equals()
+// Returns true if A is same int sequence as B, false otherwise.
+bool equals(List A, List B){
+   if( A==NULL || B==NULL ){
+      printf("List Error: calling equals() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+
+   bool eq;
+   Node N, M;
+
+   eq = ( A->length == B->length );
+   N = A->front;
+   M = B->front;
+   while( eq && N!=NULL){
+      eq = ( N->data==M->data );
+      N = N->next;
+      M = M->next;
+   }
+   return eq;
+}
+
+
+// Manipulation procedures ----------------------------------------------------
+
+// Overwrites the cursor element’s data with x.
+// Pre: length()>0, index()>=0
+void set(List L, int x){
+   if (length(L)>0 && index(L)>=0){
+      L->cursor->data = x;
+   }
+} 
+
+// If L is non-empty, sets cursor under the front element,
+// otherwise does nothing.
+void moveFront(List L){
+   if (length(L)>0){
+      L->cursorIndex = 0;
+      L->cursor = L->front;
+   }
+   
+} 
+
+// If L is non-empty, sets cursor under the back element,
+// otherwise does nothing.
+
+//to do: pre conditions list null and list empty
+void moveBack(List L){
+   
+   if (length(L)>0){
+      L->cursorIndex = length(L)-1;
+      L->cursor = L->back;
+      
+   }
+}
+
+
+ // If cursor is defined and not at front, move cursor one
+ // step toward the front of L; if cursor is defined and at
+ // front, cursor becomes undefined; if cursor is undefined
+ // do nothing
+void movePrev(List L){
+   
+   if (index(L)>1){
+      L->cursor = L->cursor->previous;
+      L->cursorIndex--;
+   }
+   else if (index(L) == 1){
+      L->cursor = NULL;
+      L->cursorIndex = -1;
+   }
+}
+
+
+// If cursor is defined and not at back, move cursor one
+ // step toward the back of L; if cursor is defined and at
+ // back, cursor becomes undefined; if cursor is undefined
+ // do nothing
+void moveNext(List L){
+
+
+   if (index(L) == length(L)){
+      L->cursor = NULL;
+      L->cursorIndex = -1;
+   }
+   else if (index(L) < length(L) && (L->cursor!=NULL)){
+      L->cursorIndex++;
+      L->cursor = L->cursor->next;
+   }
+} 
+
+
+ // Insert new element into L. If L is non-empty,
+ // insertion takes place before front element.
+void prepend(List L, int x){
+   Node new = newNode(x);
+
+   if( L==NULL ){
+      printf("List Error: calling prepend() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if (length(L)>0){
+      L->front->previous = new; 
+      new->next = L->front;
+      L->front = new;
+      
+   }
+   else{
+      L->front = L->back = new;
+      
+   }
+   L->length++;
+}
+
+
+// Insert new element into L. If L is non-empty,
+ // insertion takes place after back element.
+void append(List L, int x){
+   
+   Node new = newNode(x);
+
+   if( L==NULL ){
+      printf("List Error: calling append() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if (length(L)>0){
+      L->back->next = new; 
+      new->previous = L->back;
+      L->back = new;
+      
+   }
+   else{
+      L->front = L->back = new;
+      
+   }
+   L->length++;
+} 
+
+// Insert new element before cursor.
+ // Pre: length()>0, index()>=0
+void insertBefore(List L, int x){
+   if (length(L)>0 && index(L)>=0){
+      Node new = newNode(x);
+      new ->next = L->cursor;
+      new-> previous = L->cursor->previous;
+
+      L->cursor->previous = new;
+      new->previous->next = new;
+       L->length ++;
+
+   }
+} 
+
+ // Insert new element after cursor.
+ // Pre: length()>0, index()>=0
+void insertAfter(List L, int x){
+   if (length(L)>0 && index(L)>=0){
+      Node new = newNode(x);
+      new ->previous = L->cursor;
+      new->next = L->cursor->next;
+
+
+      L->cursor->next = new;
+      new->next->previous = new;
+      L->length ++;
+   }
+}
+
+
+// Delete the front element. Pre: length()>0
+void deleteFront(List L){
+   //set cursor to NULL if front is cursor
+   if (length(L)>0 ){
+      Node N = L->front;
+      L->front = L->front->next;
+      L->front->previous = NULL;
+
+      L->front->next->previous = L->front;
+
+      L->length --;
+      L->cursorIndex --;
+      freeNode(&(N));
+      
+   }
+}
+
+ // Delete the back element. Pre: length()>0
+void deleteBack(List L){
+   //set cursor to NULL if delete is cursor
+   if (length(L)>0 ){
+      Node N = L->back;
+      L->back = L->back->previous;
+      L->back->next = NULL;
+
+      L->back->previous->next = L->back;
+
+      L->length --;
+      L->cursorIndex ++;
+      freeNode(&(N));
+      
+   }
+}
+
+// Delete cursor element, making cursor undefined.
+//to do: error handling
+void delete(List L){
+   if (L->cursorIndex >= 0){
+      
+      L->cursor->previous->next = L->cursor->next;
+      L->cursor->next->previous = L->cursor->previous;
+     
+      freeNode(&(L->cursor));
+
+      L->cursor = NULL;
+      L->cursorIndex = -1;
+      L->length --;
+   }
+} 
+
+
+// Prints to the file pointed to by out, a
+ // string representation of L consisting
+ // of a space separated sequence of integers,
+// with front on left.
+void printList(FILE* out, List L){
+
+   Node current = L->front;
+
+   while (current != NULL) {
+        fprintf(out, "%d ", current->data);
+        current = current->next;  
+    }
+}
+
+
+// Returns a new List representing the same integer
+// sequence as L. The cursor in the new list is undefined,
+// regardless of the state of the cursor in L. The state
+// of L is unchanged.
+List copyList(List L){
+   List nL = newList();
+   Node currNode = L->front;
+
+   while(currNode != NULL ){
+      append(nL, currNode->data);
+      currNode = currNode->next;
+   }
+
+   return nL;
+}
