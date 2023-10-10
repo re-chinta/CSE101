@@ -50,12 +50,16 @@ int main(int argc, char* argv[]){
     printf("cursor: %d\n", get(l2)); 
     insertAfter(l2, 21);
 
-    printList(stdout, l2);
-    printf("\n");
+    
 
-    //deleteBack(l2);
+    printList(stdout, l2);
+
+
+
+    deleteBack(l1);
     deleteFront(l2);
     printList(stdout, l2);
+    printList(stdout, l1);
 
 
 
