@@ -1,3 +1,7 @@
+/*Reema Chintala
+rechinta
+PA1*/
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
@@ -17,8 +21,6 @@ int main(int argc, char* argv[]){
       printf("Usage: %s <input file> <output file>\n", argv[0]);
       exit(1);
    }
-
-
 
 
    // open files for reading and writing 
@@ -52,7 +54,6 @@ int main(int argc, char* argv[]){
 
 
 
-
 char string[1000];
     char** stringArray = (char**)malloc(count * sizeof(char*));
 
@@ -68,6 +69,8 @@ char string[1000];
       strcpy (stringArray[i], string);
 
    }
+
+   
 
 
 
@@ -103,10 +106,6 @@ char string[1000];
       moveNext(StringList);
 
     }
-
-   
-
-
 
 
     freeList(&StringList);
