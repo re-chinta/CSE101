@@ -1,3 +1,16 @@
+/*Reema Chintala
+rechinta
+PA2*/
+
+#include "List.h"
+#define INF -1
+#define NIL -2
+
+typedef struct GraphObj* Graph;
+
+
+
+
 /*** Constructors-Destructors ***/
 Graph newGraph(int n);
 void freeGraph(Graph* pG);
