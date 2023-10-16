@@ -112,7 +112,7 @@ int getParent(Graph G, int u){
       exit(EXIT_FAILURE);
     }
 
-    if (G->source == NIL){
+    if (getSource(G) == NIL){
         return NIL;
     }
     return G->parent[u];
@@ -128,7 +128,7 @@ int getDist(Graph G, int u){
       exit(EXIT_FAILURE);
     }
 
-    if (G->source == NIL){
+    if (getSource(G) == NIL){
         return INF;
     }
 
@@ -142,10 +142,17 @@ void getPath(List L, Graph G, int u){
       printf("Graph Error: calling getPath() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
-
-
-
-
+    if (u == getSource(G)){
+        append(L, getSource(G));
+    }
+        
+   else if (G->parent[u] == NIL){
+        append(L, NIL);
+    }
+   else{
+        getPath(L, G, G->parent[u]);
+        append(L, u);
+   }
 }
 
 
@@ -158,7 +165,7 @@ void makeNull(Graph G){
       exit(EXIT_FAILURE);
     }
 
-    for (int i = 1; i < G->order+1; i++){
+    for (int i = 1; i < getOrder(G)+1; i++){
         if (G->neighbors[i] != NULL){
             clear(G->neighbors[i]);
         }
@@ -264,8 +271,7 @@ void BFS(Graph G, int s){
       exit(EXIT_FAILURE);
     }
 
-
-    for (int i = 1; i < G->order+1; i ++){
+    for (int i = 1; i < getOrder(G) + 1; i ++){
 
         if (i != s){
             G->color[i] = 'w';
@@ -273,30 +279,34 @@ void BFS(Graph G, int s){
             G->parent[i] = NIL;
         }
     } 
-    
+
     G->color[s] = 'g';       // discover the source s
     G->distance[s] = 0;
     G->parent[s] = NIL; 
 
-
     List Q = newList();              // construct a new empty queue
     append(Q,s);
 
-    while (length(Q) > 0){
+
+    while (length(Q) != 0){
+
         int x = front(Q);
-        for (int i = 0; i < length(G->neighbors[x]); i++){
+        deleteFront(Q);
+
+        for (int i = 0; i < length((G->neighbors)[x]); i++){
+
+            moveFront(G->neighbors[x]);
             int y = get(G->neighbors[x]);
+
             if (G->color[y] == 'w' ){        // y is undiscovered
                 G->color[y] = 'g';         // discover y
-                G->distance[y] = G->distance[x]+1;
+                G->distance[y] = getDist(G, x) + 1; 
                 G->parent[y] = x;
                 append(Q,y);
-            }
-            moveFront(G->neighbors[x]);
+            } 
         }
         G->color[x] = 'b';                  // finish x
     }
-
 }
 
 
@@ -306,8 +316,9 @@ void printGraph(FILE* out, Graph G){
       printf("Graph Error: calling getDist() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
-
-  
-
-
+    for (int i = 1; i < getOrder(G)+1; i ++ ){ 
+        fprintf(out, "%d: ", i);
+        printList(out, G->neighbors[i]);
+        fprintf(out, "\n");
+    }
 }
