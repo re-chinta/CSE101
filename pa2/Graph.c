@@ -129,6 +129,7 @@ int getDist(Graph G, int u){
     }
 
     if (getSource(G) == NIL){
+        printf("hello\n");
         return INF;
     }
 
@@ -271,6 +272,8 @@ void BFS(Graph G, int s){
       exit(EXIT_FAILURE);
     }
 
+    G->source = s;
+
     for (int i = 1; i < getOrder(G) + 1; i ++){
 
         if (i != s){
@@ -293,9 +296,11 @@ void BFS(Graph G, int s){
         int x = front(Q);
         deleteFront(Q);
 
+        moveFront(G->neighbors[x]);
+
         for (int i = 0; i < length((G->neighbors)[x]); i++){
 
-            moveFront(G->neighbors[x]);
+            
             int y = get(G->neighbors[x]);
 
             if (G->color[y] == 'w' ){        // y is undiscovered
@@ -304,6 +309,8 @@ void BFS(Graph G, int s){
                 G->parent[y] = x;
                 append(Q,y);
             } 
+
+            moveNext(G->neighbors[x]);
         }
         G->color[x] = 'b';                  // finish x
     }
