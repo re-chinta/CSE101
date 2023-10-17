@@ -32,6 +32,7 @@ typedef struct GraphObj{
 Graph newGraph(int n){
 
     Graph G = malloc(sizeof(GraphObj));
+    
     assert( G!=NULL );
     G -> size = 0;
     G -> order = n;
@@ -41,39 +42,48 @@ Graph newGraph(int n){
     G -> neighbors = (List*)calloc(n+1, sizeof(List));
 
 
-    for (int i = 1; i < n+1; i++){
+    for (int i = 0; i < n+1; i++){
         G->neighbors[i] = newList();
     }
-
-
-    G -> color = (char*)calloc(n+1, sizeof(char));
-
     
 
 
+    G -> color = (char*)calloc(n+1, sizeof(char));
     G -> parent = (int*)calloc(n+1, sizeof(int));
     G -> distance = (int*)calloc(n+1, sizeof(int));
+    
 
     return(G);
 
 }
 void freeGraph(Graph* pG){
-    if( pG==NULL && *pG!=NULL ){
+    if( pG!=NULL && *pG!=NULL ){
 
-        for (int i = 1; i < ((*pG)->order +1); i++){
+        
+
+        
+
+        for (int i = 0; i < ((*pG)->order) +1; i++){
             if ((*pG)->neighbors[i] != NULL){
                 freeList(&((*pG)->neighbors[i]));
             }
             
         }
+        
         free((*pG)->neighbors);
         free((*pG)->color);
         free((*pG)->parent);
         free((*pG)->distance);
 
+        
         free(*pG);
         *pG = NULL;
-   }
+        
+    }
+    
+
+    
+   
 }
 
 /*** Access functions ***/
@@ -129,7 +139,6 @@ int getDist(Graph G, int u){
     }
 
     if (getSource(G) == NIL){
-        printf("hello\n");
         return INF;
     }
 
@@ -162,7 +171,7 @@ void getPath(List L, Graph G, int u){
 
 void makeNull(Graph G){
     if( G==NULL ){
-      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      printf("Graph Error: calling makeNull() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
 
@@ -180,7 +189,7 @@ void makeNull(Graph G){
 void addEdge(Graph G, int u, int v){
 
     if( G==NULL ){
-      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      printf("Graph Error: calling addEdge() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
 
@@ -237,7 +246,7 @@ void addEdge(Graph G, int u, int v){
 
 void addArc(Graph G, int u, int v){
     if( G==NULL ){
-      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      printf("Graph Error: calling addArc() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
 
@@ -268,7 +277,7 @@ void addArc(Graph G, int u, int v){
 
 void BFS(Graph G, int s){
     if( G==NULL ){
-      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      printf("Graph Error: calling BFS() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
 
@@ -313,14 +322,19 @@ void BFS(Graph G, int s){
             moveNext(G->neighbors[x]);
         }
         G->color[x] = 'b';                  // finish x
+
+        
     }
+    freeList(&Q);
+
+    
 }
 
 
 /*** Other operations ***/
 void printGraph(FILE* out, Graph G){
     if( G==NULL ){
-      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      printf("Graph Error: calling printGraph() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
     }
     for (int i = 1; i < getOrder(G)+1; i ++ ){ 
