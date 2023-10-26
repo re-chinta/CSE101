@@ -1,45 +1,97 @@
 /*Reema Chintala
 rechinta
-PA3*/
+PA2*/
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<stdint.h>
 #include "Graph.h"
-#include "List.h"
 
 int main(int argc, char* argv[]){
+    
+    int n = 5;
+
+    Graph G = newGraph(n);
+
+    
+
+    addArc(G, 1, 2);
+    addArc(G, 2, 3);
+    addArc(G, 3, 4);
+    addArc(G, 4, 5);
+    addArc(G, 1, 5);
+    addArc(G, 3, 1);
+    addArc(G, 4, 3);
+    addArc(G, 5, 5);
+    addArc(G, 1, 5);
+    addArc(G, 2, 1);
+
+    printGraph(stdout, G);
+
+    printf("\nOrder: %d\n", getOrder(G));
+    printf("Size: %d\n", getSize(G));
+
+    List S = newList();
+    
+    for(int i=1; i<=n; i++) append(S, i);
 
 
-    Graph A = newGraph(100);
-    List L = newList();
+    
+
+    DFS(G, S);
 
 
-    if (getSize(A) != 0)
-      return 1;
-    addArc(A, 54, 1); ///
-    addArc(A, 54, 2); ///
-    addArc(A, 54, 2);
-    addArc(A, 54, 3); ///
-    addArc(A, 1, 54); ///
-    addArc(A, 1, 54);
-    addArc(A, 1, 55); ///
-    addArc(A, 1, 55);
+    printf("\nCalled DFS \n");
 
-    for (uint8_t i = 1; i <= 100; i++) {
-      append(L, i);
+    printf("\nDiscover times are: \n");
+
+    for(int i = 1; i < getOrder(G)+1; i++){
+
+      printf("%d ", getDiscover(G, i));
+
     }
-    DFS(A, L);
-    if (getSize(A) != 5)
-      return 3;
-    addArc(A, 55, 1);
-    if (getSize(A) != 6)
-      return 4;
-    return 0;
+
+    printf("\n\nFinish times are: \n");
+
+    for(int i = 1; i < getOrder(G)+1; i++){
+
+      printf("%d ", getFinish(G, i));
+
+    }
+
+    printf("\n\nParents are: \n");
+
+    for(int i = 1; i < getOrder(G)+1; i++){
+
+      printf("%d ", getParent(G, i));
+
+    }
+
+
+     printf("\n\nStack after DFS is: \n");
 
     
-    
-    
+
+    printList(stdout, S);
+
+    Graph T = transpose(G);
+
+    printf("\n\nTranspose is: \n");
+
+    printGraph(stdout, T);
+
+
+    Graph C = copyGraph(T);
+    printf("\nCopy is: \n");
+    printGraph(stdout, C);
+
+
+    freeGraph(&G);
+    freeGraph(&T);
+    freeGraph(&C);
+    freeList(&S);
+   
+
+    freeGraph(&G);
 
     return 0;
 }
