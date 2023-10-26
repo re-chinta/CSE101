@@ -298,7 +298,6 @@ void addArc(Graph G, int u, int v){
 
 
 
-
 void Visit(Graph G, int x, int* time, List S){
     
     G->discover[x] = ++(*time);        // discover x
