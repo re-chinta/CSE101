@@ -1,6 +1,6 @@
 /*Reema Chintala
 rechinta
-PA2*/
+PA3*/
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -318,6 +318,18 @@ void Visit(Graph G, int x, int* time, List S){
 }
 
 void DFS(Graph G, List S){
+
+    if( G==NULL ){
+      printf("Graph Error: calling DFS() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
+    if(length(S)!=getOrder(G)){
+      printf("Graph Error: len of stack and num of graph vertices not the same\n");
+      exit(EXIT_FAILURE);
+    }
+
+
 
     for (int i = 1; i < getOrder(G) + 1; i ++){
         G->color[i] = 'w';
