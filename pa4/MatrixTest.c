@@ -6,11 +6,29 @@
      
 int main(int argc, char* argv[]){
 
-    Matrix M = newMatrix(10);
+    Matrix A = newMatrix(1);
 
-    printMatrix(stdout, M);
+    changeEntry(A, 1,1,999);
+    printMatrix(stdout, A);
+    
 
-    freeMatrix(&M);
+    
+    /*
+    
+
+    changeEntry(A, 2,1,1);
+    changeEntry(A, 2,2,1);
+    changeEntry(A, 2,3,1);
+
+    changeEntry(A, 3,1,1);
+    changeEntry(A, 3,2,1);
+    changeEntry(A, 3,3,1);
+*/
+
+   
+    
+
+    //freeMatrix(&A);
 
     return EXIT_SUCCESS;
 

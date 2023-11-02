@@ -5,6 +5,8 @@
 #include "Matrix.h"
 #include "List.h"
 
+typedef struct EntryObj* Entry;
+
 typedef struct MatrixObj{
     List* row;
     int size;
@@ -18,9 +20,6 @@ typedef struct EntryObj{
 
 
 
-typedef struct EntryObj* Entry;
-
-
 
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
@@ -31,9 +30,11 @@ Matrix newMatrix(int n){
 
     M->size = n;
 
+    M->nnz = 0;
+
     M -> row = (List*)calloc(n+1, sizeof(List));
     
-    for (int i = 0; i < n+1; i++){
+    for (int i = 1; i < n+1; i++){
         M->row[i] = newList();
     }
 
@@ -43,10 +44,13 @@ Matrix newMatrix(int n){
 }
 
 
-Entry newEntry(void){
+Entry newEntry(int col, double value){
 
     Entry E = malloc(sizeof(EntryObj));
     assert(E != NULL);
+
+    E->col = col;
+    E->value = value;
 
     return E;
 }
@@ -70,7 +74,7 @@ void freeMatrix(Matrix* pM){
 
         makeZero(*pM);
         
-        for (int i = 0; i < size(*pM)+1; i++){
+        for (int i = 1; i < size(*pM)+1; i++){
             if ((*pM)->row[i] != NULL){
                 freeList(&((*pM)->row[i]));
             }
@@ -123,7 +127,83 @@ void makeZero(Matrix M){
 // changeEntry()
 // Changes the ith row, jth column of M to the value x.
 // Pre: 1<=i<=size(M), 1<=j<=size(M)
-void changeEntry(Matrix M, int i, int j, double x);
+void changeEntry(Matrix M, int i, int j, double x){
+
+    List L = M->row[i];
+
+    bool insert = false;
+
+    if (length(L)==0){
+        if (x != 0){
+            Entry E = newEntry(j, x);
+            prepend(L, &E);
+            printf("Col: %d\n", E->col);
+            printf("Val: %lf\n",  E->value);
+            M-> nnz++;
+            insert = true;
+        }
+    }
+
+    /*
+
+
+    else{
+
+        
+
+        Entry E1;
+
+        
+        
+        while (index(L) < length(L)){
+            E1 = *(Entry*)get(L);
+            if (E1->col == j){
+                if (x != 0){
+                    E1->value = x;
+                    M->nnz++;
+                }
+                else{
+                    freeEntry(&E1);
+                    delete(L);
+                    M->nnz--;
+                }
+                insert = true;
+                break;
+            }
+            if (E1->col > j){
+                if (x != 0){
+                    Entry Insert = newEntry(j, x);
+                    insertBefore(L, Insert);
+                    M->nnz++;
+                }
+                insert = true;
+
+            }            
+            moveNext(L);
+        }
+    }
+
+    
+
+    if (insert == false){
+            Entry E2 = newEntry(j, x);
+            prepend(L, E2);
+            M->nnz++;
+    }
+
+    */
+
+
+    moveFront(L);
+    printf("Val at end: %f\n", (*(Entry*)get(L))->value);
+    printf("col at end: %d\n", (*(Entry*)get(L))->col);
+
+
+
+}
+
+
+
 // Matrix Arithmetic operations
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
@@ -157,9 +237,27 @@ Matrix product(Matrix A, Matrix B);
 // in that row. The double val will be rounded to 1 decimal point.
 void printMatrix(FILE* out, Matrix M){
 
+
+    /*
+
+    List L = M->row[1];
+
+
+    moveFront(L);
+
+    printf("nnz:%d \n", M->nnz);
+
+    printf("val in print function: %f\n", (*(Entry*)get(M->row[1]))->value);
+    printf("col in print function: %d\n", (*(Entry*)get(M->row[1]))->col);
+
+    */
+
     
 
-    for (int i = 1; i < size(M); i ++){
+    
+
+
+    for (int i = 1; i < size(M)+1; i++){
 
         List L = M->row[i];
 
@@ -168,15 +266,34 @@ void printMatrix(FILE* out, Matrix M){
             
             moveFront(L);
 
-            Entry E;
+            //Entry* E;
+
+            //printf("hellohello\n");
+
+            
         
-            for (int i = 0; i < length(L); i ++ ){
-                E = *(Entry*)get(L);
-                fprintf(out, "(%d, %f)", E->col, E->value);
+            for (int j = 1; j < length(L)+1; j ++ ){
+
+                
+                //E = get(L);
+                printf("%d \n", (*(Entry*)get(L))->col);
+
+
+                
+                //fprintf(out, "(%d, %lf)", (E)->col, (E)->value);
+                
+                
                 moveNext(L);
+                
             }
+
+            fprintf(out, "\n");
+
+
 
         }
         
     }
+
+    
 }
