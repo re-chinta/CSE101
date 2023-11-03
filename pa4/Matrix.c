@@ -131,17 +131,17 @@ void changeEntry(Matrix M, int i, int j, double x){
 
     List L = M->row[i];
 
-    bool insert = false;
+    //int insertn;
 
     if (length(L)==0){
-        if (x != 0){
+        //if (x != 0){
             Entry E = newEntry(j, x);
             prepend(L, &E);
-            printf("Col: %d\n", E->col);
-            printf("Val: %lf\n",  E->value);
+            //printf("Col: %d\n", E->col);
+            //printf("Val: %lf\n",  E->value);
             M-> nnz++;
-            insert = true;
-        }
+            //insert = true;
+        //}
     }
 
     /*
@@ -193,10 +193,8 @@ void changeEntry(Matrix M, int i, int j, double x){
 
     */
 
-
-    moveFront(L);
-    printf("Val at end: %f\n", (*(Entry*)get(L))->value);
-    printf("col at end: %d\n", (*(Entry*)get(L))->col);
+    //moveFront(M->row[i]);
+    //printf("(%d, %f) ", (*(Entry*)get(M->row[i]))->col, (*(Entry*)get(M->row[i]))->value);
 
 
 
@@ -211,7 +209,12 @@ Matrix copy(Matrix A);
 // transpose()
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
-Matrix transpose(Matrix A);
+Matrix transpose(Matrix A){
+    moveFront(A->row[1]);
+    printf("(%d, %f) ", (*(Entry*)get(A->row[1]))->col, (*(Entry*)get(A->row[1]))->value);
+
+    return A;
+}
 // scalarMult()
 // Returns a reference to a new Matrix object representing xA.
 Matrix scalarMult(double x, Matrix A);
@@ -237,25 +240,15 @@ Matrix product(Matrix A, Matrix B);
 // in that row. The double val will be rounded to 1 decimal point.
 void printMatrix(FILE* out, Matrix M){
 
+   //moveFront(M->row[2]);
+  // fprintf(out, "(%d, %f) ", (*(Entry*)get(M->row[2]))->col, (*(Entry*)get(M->row[2]))->value);
+
+
 
     /*
 
-    List L = M->row[1];
-
-
-    moveFront(L);
-
-    printf("nnz:%d \n", M->nnz);
-
-    printf("val in print function: %f\n", (*(Entry*)get(M->row[1]))->value);
-    printf("col in print function: %d\n", (*(Entry*)get(M->row[1]))->col);
-
-    */
-
     
-
     
-
 
     for (int i = 1; i < size(M)+1; i++){
 
@@ -266,23 +259,11 @@ void printMatrix(FILE* out, Matrix M){
             
             moveFront(L);
 
-            //Entry* E;
-
-            //printf("hellohello\n");
-
-            
         
-            for (int j = 1; j < length(L)+1; j ++ ){
+            while(index(L) != -1){
 
                 
-                //E = get(L);
-                printf("%d \n", (*(Entry*)get(L))->col);
-
-
-                
-                //fprintf(out, "(%d, %lf)", (E)->col, (E)->value);
-                
-                
+                fprintf(out, "(%d, %f) ", (*(Entry*)get(L))->col, (*(Entry*)get(L))->value);
                 moveNext(L);
                 
             }
@@ -295,5 +276,6 @@ void printMatrix(FILE* out, Matrix M){
         
     }
 
+*/
     
 }
