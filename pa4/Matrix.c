@@ -131,20 +131,20 @@ void changeEntry(Matrix M, int i, int j, double x){
 
     List L = M->row[i];
 
-    //int insertn;
+    int insert = false;
 
     if (length(L)==0){
-        //if (x != 0){
+        //printf("check\n");
+        if (x != 0){
             Entry E = newEntry(j, x);
-            prepend(L, &E);
-            //printf("Col: %d\n", E->col);
-            //printf("Val: %lf\n",  E->value);
+            prepend(L, E);
+            
             M-> nnz++;
-            //insert = true;
-        //}
+            insert = true;
+        }
     }
 
-    /*
+    
 
 
     else{
@@ -153,14 +153,21 @@ void changeEntry(Matrix M, int i, int j, double x){
 
         Entry E1;
 
+        moveFront(L);
+            
+        while (index(L) != -1){
         
-        
-        while (index(L) < length(L)){
-            E1 = *(Entry*)get(L);
+            
+            E1 = (Entry)get(L);
+
+
+
+            //if there is already a nnx at that column
             if (E1->col == j){
+                
                 if (x != 0){
                     E1->value = x;
-                    M->nnz++;
+       
                 }
                 else{
                     freeEntry(&E1);
@@ -171,6 +178,7 @@ void changeEntry(Matrix M, int i, int j, double x){
                 break;
             }
             if (E1->col > j){
+                
                 if (x != 0){
                     Entry Insert = newEntry(j, x);
                     insertBefore(L, Insert);
@@ -179,24 +187,21 @@ void changeEntry(Matrix M, int i, int j, double x){
                 insert = true;
 
             }            
+            
             moveNext(L);
+            
         }
     }
 
     
 
-    if (insert == false){
+    if ((insert == false) && (x != 0)){
             Entry E2 = newEntry(j, x);
-            prepend(L, E2);
+            append(L, E2);
             M->nnz++;
     }
 
-    */
-
-    //moveFront(M->row[i]);
-    //printf("(%d, %f) ", (*(Entry*)get(M->row[i]))->col, (*(Entry*)get(M->row[i]))->value);
-
-
+   
 
 }
 
@@ -240,16 +245,6 @@ Matrix product(Matrix A, Matrix B);
 // in that row. The double val will be rounded to 1 decimal point.
 void printMatrix(FILE* out, Matrix M){
 
-   //moveFront(M->row[2]);
-  // fprintf(out, "(%d, %f) ", (*(Entry*)get(M->row[2]))->col, (*(Entry*)get(M->row[2]))->value);
-
-
-
-    /*
-
-    
-    
-
     for (int i = 1; i < size(M)+1; i++){
 
         List L = M->row[i];
@@ -263,7 +258,7 @@ void printMatrix(FILE* out, Matrix M){
             while(index(L) != -1){
 
                 
-                fprintf(out, "(%d, %f) ", (*(Entry*)get(L))->col, (*(Entry*)get(L))->value);
+                fprintf(out, "(%d, %f) ", ((Entry)get(L))->col, ((Entry)get(L))->value);
                 moveNext(L);
                 
             }
@@ -276,6 +271,6 @@ void printMatrix(FILE* out, Matrix M){
         
     }
 
-*/
+
     
 }
