@@ -522,7 +522,7 @@ Matrix product(Matrix A, Matrix B){
 
         for (int j = 1; j < size(C)+1; j++){
             
-            double dotProduct = dot(A->row[i], T->row[i]);
+            double dotProduct = dot(A->row[i], T->row[j]);
 
             printf("dot is: %f\n", dotProduct);
 
