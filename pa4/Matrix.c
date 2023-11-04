@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<stdbool.h>
+#include<math.h>
 #include "Matrix.h"
 #include "List.h"
 
@@ -134,7 +135,7 @@ void changeEntry(Matrix M, int i, int j, double x){
     int insert = false;
 
     if (length(L)==0){
-        //printf("check\n");
+        
         if (x != 0){
             Entry E = newEntry(j, x);
             prepend(L, E);
@@ -210,7 +211,32 @@ void changeEntry(Matrix M, int i, int j, double x){
 // Matrix Arithmetic operations
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
-Matrix copy(Matrix A);
+Matrix copy(Matrix A){
+
+    Matrix B = newMatrix(size(A));
+    
+    for (int i = 1; i < size(A)+1; i++){
+
+        List L = A->row[i];
+
+        if (length(L)>0){
+            
+            moveFront(L);
+            while(index(L) != -1){
+
+                Entry E = newEntry(((Entry)get(L))->col, ((Entry)get(L))->value);
+                append(B->row[i], E);
+            
+                B-> nnz++;
+                moveNext(L);
+                
+            }
+        }
+    }
+    return B;
+}
+
+
 // transpose()
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
@@ -253,12 +279,10 @@ void printMatrix(FILE* out, Matrix M){
             fprintf(out, "%d: ", i);
             
             moveFront(L);
-
-        
             while(index(L) != -1){
 
                 
-                fprintf(out, "(%d, %f) ", ((Entry)get(L))->col, ((Entry)get(L))->value);
+                fprintf(out, "(%d, %.1f) ", ((Entry)get(L))->col, ((Entry)get(L))->value);
                 moveNext(L);
                 
             }
