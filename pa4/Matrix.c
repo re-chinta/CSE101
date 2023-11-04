@@ -168,6 +168,7 @@ void makeZero(Matrix M){
             delete(L);
         }
     }
+    M->nnz = 0;
 }
 
 
@@ -400,108 +401,129 @@ double dot(List A, List B){
 
 
 
-
-
-void add(List A, List B, List C){
-
-    
-
-    
-
-    // double sum = 0;
-
-    // if(length(A) != length(B)){
-    //     printf("Matrix Error for dot helper function: len of two lists are not equal\n");
-    //     freeList(&A);
-    //     freeList(&B);
-    //     exit(EXIT_FAILURE);
-    // }
-
-    // moveFront(A);
-    // moveFront(B);
-
-    // while(index(A) != -1 && index(B) != -1){
-
-
-
-    //         while (((((Entry)get(A))->col) != (((Entry)get(B))->value))){
-    //             if ((((Entry)get(A))->col) > (((Entry)get(B))->col)){
-    //                 moveNext(B);
-    //             }
-    //             else{
-    //                 moveNext(A);
-    //             }
-    //         }
-
-    //         if ((index(A) != -1) && (index(B) != -1)) {
-    //             double product = (((Entry)get(A))->value) * (((Entry)get(B))->value);
-    //             sum += product;
-    //         }
-
-    //         moveNext(A);
-    //         moveNext(B);
-
-    //     }
-
-
-}
-
-List sub(List A, List B){
-
-    List C = newList();
-
-    double diff = 0;
-
-    if(length(A) != length(B)){
-        printf("Matrix Error for dot helper function: len of two lists are not equal\n");
-        freeList(&A);
-        freeList(&B);
-        exit(EXIT_FAILURE);
-    }
+void add(List A, List B, List Result){
 
     moveFront(A);
     moveFront(B);
+    
+    while((index(A) >= 0) && (index(B) >= 0)){
 
-    while(index(A) != -1){
+        Entry a = (Entry)get(A);
+        Entry b = (Entry)get(B);
 
-        diff = (((Entry)get(A))->value) - (((Entry)get(B))->value);
+        int col_A = a->col;
+        int col_B = b->col;
 
-        if (diff != 0){
+        int val_A = a->value;
+        int val_B = b->value;
 
-            Entry E = newEntry(index(A), diff);
-            append(C, E);
-
+        if (col_A == col_B){
+            if ((val_A + val_B) != 0){
+                append(Result, newEntry(col_A, val_A + val_B));
+                
+            }
+            moveNext(A);
+            moveNext(B);
         }
-
-
-        moveNext(A);
-        moveNext(B);
-
+        else if(col_A < col_B){
+            while(index(A)>=0){
+                append(Result, newEntry(col_A, val_A));
+                moveNext(A);
+            }
+        }
+        else{
+            while(index(B)>=0){
+                append(Result, newEntry(col_B, val_B));
+                moveNext(B);
+            }   
+        }
     }
-
-    return C;
-
 }
 
-    
+void sub(List A, List B, List Result){
 
+    moveFront(A);
+    moveFront(B);
+    
+    while((index(A) >= 0) && (index(B) >= 0)){
+
+        Entry a = (Entry)get(A);
+        Entry b = (Entry)get(B);
+
+        int col_A = a->col;
+        int col_B = b->col;
+
+        int val_A = a->value;
+        int val_B = b->value;
+
+        if (col_A == col_B){
+            if ((val_A - val_B) != 0){
+                append(Result, newEntry(col_A, val_A - val_B));
+            }
+            moveNext(A);
+            moveNext(B);
+        }
+        else if(col_A < col_B){
+            while(index(A)>=0){
+                append(Result, newEntry(col_A, -val_A));
+                moveNext(A);
+            }
+        }
+        else{
+            while(index(B)>=0){
+                append(Result, newEntry(col_B, -val_B));
+                moveNext(B);
+            }   
+        }
+    }
+}
 
 
 // sum()
 // Returns a reference to a new Matrix object representing A+B.
 // pre: size(A)==size(B)
 Matrix sum(Matrix A, Matrix B){
+
     if (equals(A, B)){
+        printf("is equal\n");
         return scalarMult(2, A);
     }
 
-    return A;
+    Matrix C = newMatrix(size(A));
+
+    for (int i = 1; i < size(A) + 1; i ++){
+
+        List L = C->row[i];
+
+        add(A->row[i], B->row[i], L);
+
+        C->nnz += length(L);
+
+    }
+
+    return C;
 }
 
 // diff()
 // Returns a reference to a new Matrix object representing A-B.
 // pre: size(A)==size(B)
-Matrix diff(Matrix A, Matrix B);
+Matrix diff(Matrix A, Matrix B){
+
+    Matrix C = newMatrix(size(A));
+
+    for (int i = 1; i < size(A) + 1; i ++){
+
+        List L = C->row[i];
+
+        sub(A->row[i], B->row[i], L);
+
+        C->nnz += length(L);
+
+    }
+
+    return C;
+
+}
 
 
 // product()
@@ -524,12 +546,13 @@ Matrix product(Matrix A, Matrix B){
             
             double dotProduct = dot(A->row[i], T->row[j]);
 
-            printf("dot is: %f\n", dotProduct);
+            //printf("dot is: %f\n", dotProduct);
 
             if (dotProduct != 0){
 
                 Entry E = newEntry(j, dotProduct);
                 append(L, E);
+                C->nnz++;
             
             }
 
@@ -576,41 +599,3 @@ void printMatrix(FILE* out, Matrix M){
     }
 }
 
-
-
-// double dot(List A, List B){
-    
-//         double sum = 0;
-
-//         if((length(A) == 0) || (length(B)==0)){
-//             return sum;  
-//         }
-
-//         moveFront(A);
-//         moveFront(B);
-
-//         while(index(A) != -1 || index(B) != -1){
-
-//             while ((((((Entry)get(A))->col) != (((Entry)get(B))->value)))   && ( index(A) != -1 || index(B) != -1  ) ){
-//                 if ((((Entry)get(A))->col) > (((Entry)get(B))->col)){
-//                     moveNext(B);
-//                 }
-//                 else{
-//                     moveNext(A);
-//                 }
-//             }
-
-//             if ((index(A) != -1) && (index(B) != -1)) {
-//                 double product = (((Entry)get(A))->value) * (((Entry)get(B))->value);
-//                 sum += product;
-//             }
-
-//             moveNext(A);
-//             moveNext(B);
-
-//         }
-
-//         return sum;
-
-// }
-    
