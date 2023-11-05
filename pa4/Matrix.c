@@ -362,14 +362,25 @@ double dot(List A, List B){
             moveNext(A);
             moveNext(B);
         }
-        else if(col_A < col_B){
-            while(index(A)>=0){
+         if(col_A < col_B){
+            while((index(A)>=0) && (col_A < col_B)){
                 moveNext(A);
+
+                if (index(A)>=0){
+                    a = (Entry)get(A);
+                    col_A = a->col;
+                }
+
             }
         }
-        else{
-            while(index(B)>=0){
+        if(col_A > col_B){
+            while((index(B)>=0) && (col_A > col_B)){
                 moveNext(B);
+
+                if (index(B)>=0){
+                    b = (Entry)get(B);
+                    col_B = b->col;
+                }
             }   
         }
     }
