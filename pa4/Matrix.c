@@ -20,8 +20,6 @@ typedef struct EntryObj{
 } EntryObj;
 
 
-
-
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
 Matrix newMatrix(int n){
@@ -62,9 +60,6 @@ void freeEntry(Entry* pE){
       *pE = NULL;
    }
 }
-
-
-
 
 
 // freeMatrix()
@@ -193,25 +188,15 @@ void changeEntry(Matrix M, int i, int j, double x){
         }
     }
 
-    
-
-
     else{
-
-        
-
         Entry E1;
-
         moveFront(L);
-            
-        while (index(L) != -1){
         
-            
+        while (index(L) != -1){
+                    
             E1 = (Entry)get(L);
 
-
-
-            //if there is already a nnx at that column
+            //if there is already a nnz at that column
             if (E1->col == j){
                 
                 if (x != 0){
@@ -242,16 +227,11 @@ void changeEntry(Matrix M, int i, int j, double x){
         }
     }
 
-    
-
     if ((insert == false) && (x != 0)){
             Entry E2 = newEntry(j, x);
             append(L, E2);
             M->nnz++;
     }
-
-   
-
 }
 
 
@@ -363,38 +343,39 @@ double dot(List A, List B){
 
     moveFront(A);
     moveFront(B);
+    
+    while((index(A) >= 0) && (index(B) >= 0)){
 
-    while(index(A) != -1 && index(B) != -1){
+        Entry a = (Entry)get(A);
+        Entry b = (Entry)get(B);
 
-        if ((((Entry)get(A))->col) > (((Entry)get(B))->col)){
+        int col_A = a->col;
+        int col_B = b->col;
+
+        int val_A = a->value;
+        int val_B = b->value;
+
+        if (col_A == col_B){
+            
+            sum +=  val_A * val_B;
+            moveNext(A);
             moveNext(B);
         }
-        else if ((((Entry)get(A))->col) < (((Entry)get(B))->col)){
-            moveNext(A);
-        }
-
-        if ((index(A) != -1) && (index(B) != -1)) {
-            if ((index(A) != -1) == (index(B) != -1)){
-
-
-
-                double product = (((Entry)get(A))->value) * (((Entry)get(B))->value);
-                sum += product;
-
-                printf("sum is: %f\n", sum);
-
-
+        else if(col_A < col_B){
+            while(index(A)>=0){
+                moveNext(A);
             }
         }
-
-        moveNext(A);
-        moveNext(B);
-
+        else{
+            while(index(B)>=0){
+                moveNext(B);
+            }   
+        }
     }
 
-    return sum;
+    //printf("sum is: %f\n", sum);
 
-    
+    return sum;
 
 }
 
@@ -531,24 +512,31 @@ Matrix diff(Matrix A, Matrix B){
 // pre: size(A)==size(B)
 Matrix product(Matrix A, Matrix B){
 
-    //check if both sizes are the same error handling
+    //check if both sizes are the same size error handling
 
 
     //NEW MATRIX
     Matrix C = newMatrix(size(A));
-
     Matrix T = transpose(B);
 
     for (int i = 1; i < size(C)+1; i++){
+
+        
+
+        //printf("ROW: %d\n", i);
+
         List L = C->row[i];
 
         for (int j = 1; j < size(C)+1; j++){
             
             double dotProduct = dot(A->row[i], T->row[j]);
 
-            //printf("dot is: %f\n", dotProduct);
+            //printf("dot is: %.0f\n", dotProduct);
 
             if (dotProduct != 0){
+                
+                //printf("adding: %.0f\n", dotProduct);
+
 
                 Entry E = newEntry(j, dotProduct);
                 append(L, E);
