@@ -45,6 +45,8 @@ Matrix newMatrix(int n){
 
 Entry newEntry(int col, double value){
 
+    
+
     Entry E = malloc(sizeof(EntryObj));
     assert(E != NULL);
 
@@ -56,7 +58,7 @@ Entry newEntry(int col, double value){
 
 void freeEntry(Entry* pE){
     if( pE!=NULL && *pE!=NULL ){
-      free(*pE);
+      free(pE);
       *pE = NULL;
    }
 }
@@ -89,12 +91,22 @@ void freeMatrix(Matrix* pM){
 // size()
 // Return the size of square Matrix M.
 int size(Matrix M){
+    if( M==NULL ){
+      printf("Matrix Error: calling size() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
     return M->size;
 }
 
 // NNZ()
 // Return the number of non-zero elements in M.
 int NNZ(Matrix M){
+    if( M==NULL ){
+      printf("Matrix Error: calling NNZ() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
     return M->nnz;
 }
 
@@ -102,49 +114,46 @@ int NNZ(Matrix M){
 // Return true (1) if matrices A and B are equal, false (0) otherwise.
 int equals(Matrix A, Matrix B){
 
-    bool equal = true;
-
-    if (size(A) != size(B)){
-        return false;
+    if (A == NULL || B == NULL) {
+        printf("Matrix Error: calling equals() on NULL Matrix reference\n");
+        exit(EXIT_FAILURE);
     }
 
+   if (A == B){
+        return 1;
+    }
 
-    
+    if (size(A) != size(B)){
+        return 0;
+    }
     
     for (int i = 1; i < size(A)+1; i++){
 
-        List AL = A->row[i];
-        List BL = B->row[i];
+        List L1 = A->row[i];
+        List L2 = B->row[i];
 
-        if (length(AL) != length(BL)){
-            equal = false;
-            break;
+        moveFront(L1);
+        moveFront(L2);
 
-        }
-        else if(length(AL) != 0 &&  length(BL) != 0){
+
+        for (int j = 0; j < length(L1); j++){
+
             
-            moveFront(AL);
-            moveFront(BL);
-            while(index(AL) != -1){
 
-                if ( ((((Entry)get(AL))->col) != (((Entry)get(BL))->col))  ||  ((((Entry)get(AL))->value) != (((Entry)get(BL))->value))){
-                    equal = false;
-                    break;
-                }            
-                
-                moveNext(AL);
-                moveNext(BL);
-                
+            if (( ((Entry)get(L1))->col !=  ((Entry)get(L2))->col )  ||   ( ((Entry)get(L1))->value !=  ((Entry)get(L2))->value ) ) {
+                return 0;
             }
+
+            moveNext(L1);
+            moveNext(L2);
+
+            
+
         }
-        if (equal == false){
-            break;
-        }
+        
     }
 
-
-    return equal;
-
+    return 1;
 
 }
 
@@ -153,13 +162,18 @@ int equals(Matrix A, Matrix B){
 // Re-sets M to the zero Matrix state.
 void makeZero(Matrix M){
 
+    if( M==NULL ){
+      printf("Matrix Error: calling makeZero() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
     for (int i = 1; i < size(M)+1; i ++){
         
         List L = M->row[i];
         while(length(L)>0){
             
             moveFront(L);
-            //freeEntry(get(L));
+            freeEntry(get(L));
             delete(L);
         }
     }
@@ -172,6 +186,16 @@ void makeZero(Matrix M){
 // Pre: 1<=i<=size(M), 1<=j<=size(M)
 void changeEntry(Matrix M, int i, int j, double x){
 
+    if( M==NULL ){
+      printf("Matrix Error: calling changeEntry() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
+    if (i < 1 || i > size(M) || j < 1 || j > size(M)) {
+    printf("Matrix Error: calling changeEntry() with invalid row or column indices\n");
+    exit(EXIT_FAILURE);
+}
+
     List L = M->row[i];
 
     int insert = false;
@@ -182,8 +206,8 @@ void changeEntry(Matrix M, int i, int j, double x){
         if (x != 0){
             Entry E = newEntry(j, x);
             prepend(L, E);
-            
             M-> nnz++;
+            
             insert = true;
         }
     }
@@ -201,12 +225,15 @@ void changeEntry(Matrix M, int i, int j, double x){
                 
                 if (x != 0){
                     E1->value = x;
+                    
        
                 }
                 else{
                     freeEntry(&E1);
                     delete(L);
                     M->nnz--;
+                    
+
                 }
                 insert = true;
                 break;
@@ -216,7 +243,9 @@ void changeEntry(Matrix M, int i, int j, double x){
                 if (x != 0){
                     Entry Insert = newEntry(j, x);
                     insertBefore(L, Insert);
+                    
                     M->nnz++;
+                    
                 }
                 insert = true;
                 break;
@@ -231,8 +260,11 @@ void changeEntry(Matrix M, int i, int j, double x){
     if ((insert == false) && (x != 0)){
             Entry E2 = newEntry(j, x);
             append(L, E2);
+            
             M->nnz++;
     }
+    
+
 }
 
 
@@ -241,6 +273,11 @@ void changeEntry(Matrix M, int i, int j, double x){
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
 Matrix copy(Matrix A){
+
+    if( A==NULL ){
+      printf("Matrix Error: calling copy() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
 
     Matrix B = newMatrix(size(A));
     
@@ -270,6 +307,11 @@ Matrix copy(Matrix A){
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
 Matrix transpose(Matrix A){
+
+    if( A==NULL ){
+      printf("Matrix Error: calling transpose() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
     
     Matrix B = newMatrix(size(A));
     
@@ -300,6 +342,11 @@ Matrix transpose(Matrix A){
 // scalarMult()
 // Returns a reference to a new Matrix object representing xA.
 Matrix scalarMult(double x, Matrix A){
+
+    if( A==NULL ){
+      printf("Matrix Error: calling scalarMult() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
 
     Matrix B = newMatrix(size(A));
 
@@ -336,6 +383,11 @@ Matrix scalarMult(double x, Matrix A){
 //USED BY multiply
 double dot(List A, List B){
 
+    if( A==NULL ||  B==NULL){
+      printf("Matrix Error: calling dot() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+    }
+
     double sum = 0;
 
     if((length(A) == 0) || (length(B)==0)){
@@ -353,8 +405,8 @@ double dot(List A, List B){
         int col_A = a->col;
         int col_B = b->col;
 
-        int val_A = a->value;
-        int val_B = b->value;
+        double val_A = a->value;
+        double val_B = b->value;
 
         if (col_A == col_B){
             
@@ -395,6 +447,13 @@ double dot(List A, List B){
 
 
 void add(List A, List B, List Result){
+    //printf("hello\n");
+   
+
+    if( A==NULL ||  B==NULL || Result == NULL){
+      printf("Matrix Error: calling add() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+    }
 
     moveFront(A);
     moveFront(B);
@@ -402,130 +461,87 @@ void add(List A, List B, List Result){
     Entry a;
     Entry b;
 
-    int col_A;
-    int col_B;
+    int col_A = -3;
+    int col_B = -2;
 
-    int val_A;
-    int val_B;
+    double val_A;
+    double val_B;
     
-    while((index(A) >= 0) && (index(B) >= 0)){
-
-         a = (Entry)get(A);
-         b = (Entry)get(B);
-
-         col_A = a->col;
-         col_B = b->col;
-
-         val_A = a->value;
-         val_B = b->value;
-
-        if (col_A == col_B){
-            if ((val_A + val_B) != 0){
-                append(Result, newEntry(col_A, val_A + val_B));
-                
-            }
-            moveNext(A);
-            moveNext(B);
-        }
-        else if(col_A < col_B){
-            while((index(A)>=0) && (col_A < col_B)){
-
-                a = (Entry)get(A);
-                col_A = a->col;
-                val_A = a->value;
-
-
-                append(Result, newEntry(col_A, val_A));
-                moveNext(A);
-
-                a = (Entry)get(A);
-                col_A = a->col;
-                val_A = a->value;
-
-                
-                
-            }
-        }
-        else{
-            while((index(B)>=0) && ((col_A < col_B))){
-
-                b = (Entry)get(B);
-                col_B = b->col;
-                val_B = b->value;
-
-                append(Result, newEntry(col_B, val_B));
-                moveNext(B);
-
-                b = (Entry)get(B);
-                col_B = b->col;
-                val_B = b->value;
-
-                
-            }   
-        }
-    }
-
-    while(index(B)>=0 ){
-
+    while (index(A) >= 0 && index(B) >= 0) {
+        a = (Entry)get(A);
         b = (Entry)get(B);
+        
+        col_A = a->col;
         col_B = b->col;
+        val_A = a->value;
         val_B = b->value;
 
-        append(Result, newEntry(col_B, val_B));
-        moveNext(B);
-
-        
-
-    }
-
-    while(index(A)>=0 ){
-
-        a = (Entry)get(A);
-        col_A = a->col;
-        val_A = a->value;
-
-        append(Result, newEntry(col_A, val_A));
-        moveNext(A);
-    }
-}
-
-void sub(List A, List B, List Result){
-
-    moveFront(A);
-    moveFront(B);
-    
-    while((index(A) >= 0) && (index(B) >= 0)){
-
-        Entry a = (Entry)get(A);
-        Entry b = (Entry)get(B);
-
-        int col_A = a->col;
-        int col_B = b->col;
-
-        int val_A = a->value;
-        int val_B = b->value;
-
-        if (col_A == col_B){
-            if ((val_A - val_B) != 0){
-                append(Result, newEntry(col_A, val_A - val_B));
+        if (col_A == col_B) {
+            if (val_A + val_B != 0) {
+                append(Result, newEntry(col_A, val_A + val_B));
             }
             moveNext(A);
             moveNext(B);
-        }
-        else if(col_A < col_B){
-            while(index(A)>=0){
-                append(Result, newEntry(col_A, -val_A));
-                moveNext(A);
-            }
-        }
-        else{
-            while(index(B)>=0){
-                append(Result, newEntry(col_B, -val_B));
-                moveNext(B);
-            }   
+        } else if (col_A < col_B) {
+            append(Result, newEntry(col_A, val_A));
+            moveNext(A);
+        } else {
+            append(Result, newEntry(col_B, val_B));
+            moveNext(B);
         }
     }
+
+    // Handle any remaining elements in A and B
+    while (index(A) >= 0) {
+        a = (Entry)get(A);
+        append(Result, newEntry(a->col, a->value));
+        moveNext(A);
+    }
+
+    while (index(B) >= 0) {
+        b = (Entry)get(B);
+        append(Result, newEntry(b->col, b->value));
+        moveNext(B);
+    }
 }
+
+// void sub(List A, List B, List Result){
+
+//     moveFront(A);
+//     moveFront(B);
+    
+//     while((index(A) >= 0) && (index(B) >= 0)){
+
+//         Entry a = (Entry)get(A);
+//         Entry b = (Entry)get(B);
+
+//         int col_A = a->col;
+//         int col_B = b->col;
+
+//         int val_A = a->value;
+//         int val_B = b->value;
+
+//         if (col_A == col_B){
+//             if ((val_A - val_B) != 0){
+//                 append(Result, newEntry(col_A, val_A - val_B));
+//             }
+//             moveNext(A);
+//             moveNext(B);
+//         }
+//         else if(col_A < col_B){
+//             while(index(A)>=0){
+//                 append(Result, newEntry(col_A, val_A));
+//                 moveNext(A);
+//             }
+//         }
+//         else{
+//             while(index(B)>=0){
+//                 append(Result, newEntry(col_B, -val_B));
+//                 moveNext(B);
+//             }   
+//         }
+//     }
+// }
 
 
 // sum()
@@ -533,8 +549,17 @@ void sub(List A, List B, List Result){
 // pre: size(A)==size(B)
 Matrix sum(Matrix A, Matrix B){
 
+    if( A==NULL || B==NULL){
+      printf("Matrix Error: calling sum() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
+    if( size(A) != size(B)){
+      printf("Matrix Error: calling sum() when sizes are not equivalent\n");
+      exit(EXIT_FAILURE);
+    }
+
     if (equals(A, B)){
-        
         return scalarMult(2, A);
     }
 
@@ -558,19 +583,20 @@ Matrix sum(Matrix A, Matrix B){
 // pre: size(A)==size(B)
 Matrix diff(Matrix A, Matrix B){
 
-    Matrix C = newMatrix(size(A));
-
-    for (int i = 1; i < size(A) + 1; i ++){
-
-        List L = C->row[i];
-
-        sub(A->row[i], B->row[i], L);
-
-        C->nnz += length(L);
-
+    if( A==NULL || B==NULL){
+      printf("Matrix Error: calling diff() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
     }
 
-    return C;
+    if( size(A) != size(B)){
+      printf("Matrix Error: calling diff() when sizes are not equivalent\n");
+      exit(EXIT_FAILURE);
+    }
+
+    Matrix T = scalarMult(-1, B);
+    Matrix S = sum(A, T);
+
+    return S;
 
 }
 
@@ -580,7 +606,16 @@ Matrix diff(Matrix A, Matrix B){
 // pre: size(A)==size(B)
 Matrix product(Matrix A, Matrix B){
 
-    //check if both sizes are the same size error handling
+    if( A==NULL || B==NULL){
+      printf("Matrix Error: calling product() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
+
+    if( size(A) != size(B)){
+      printf("Matrix Error: calling product() when sizes are not equivalent\n");
+      exit(EXIT_FAILURE);
+    }
+
 
 
     //NEW MATRIX
@@ -591,27 +626,27 @@ Matrix product(Matrix A, Matrix B){
 
         
 
-        //printf("ROW: %d\n", i);
+        if (length(A->row[i])>0){
 
-        List L = C->row[i];
+            List L = C->row[i];
 
-        for (int j = 1; j < size(C)+1; j++){
-            
-            double dotProduct = dot(A->row[i], T->row[j]);
+            for (int j = 1; j < size(C)+1; j++){
 
-            //printf("dot is: %.0f\n", dotProduct);
-
-            if (dotProduct != 0){
+                if ((length(T->row[j])>0)){
                 
-                //printf("adding: %.0f\n", dotProduct);
+                    double dotProduct = dot(A->row[i], T->row[j]);
+
+                    if (dotProduct != 0){
 
 
-                Entry E = newEntry(j, dotProduct);
-                append(L, E);
-                C->nnz++;
-            
+                        Entry E = newEntry(j, dotProduct);
+                        append(L, E);
+                        C->nnz++;
+                    
+                    }
+                }
+
             }
-
         }
 
     }
@@ -629,6 +664,11 @@ Matrix product(Matrix A, Matrix B){
 // list of pairs "(col, val)" giving the column numbers and non-zero values
 // in that row. The double val will be rounded to 1 decimal point.
 void printMatrix(FILE* out, Matrix M){
+
+    if( M==NULL ){
+      printf("Matrix Error: calling printMatrix() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+    }
 
     for (int i = 1; i < size(M)+1; i++){
 
@@ -654,4 +694,3 @@ void printMatrix(FILE* out, Matrix M){
         
     }
 }
-
