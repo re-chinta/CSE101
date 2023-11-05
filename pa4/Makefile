@@ -10,7 +10,7 @@
 #  make ListCheck           runs ListTest in valgrind
 #------------------------------------------------------------------------------
 
-MAIN           = ListClient
+MAIN           = Sparse
 ADT1           = Matrix
 ADT2           = List
 SOURCE         = $(MAIN).c

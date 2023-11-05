@@ -219,6 +219,7 @@ void changeEntry(Matrix M, int i, int j, double x){
                     M->nnz++;
                 }
                 insert = true;
+                break;
 
             }            
             
@@ -386,17 +387,26 @@ void add(List A, List B, List Result){
 
     moveFront(A);
     moveFront(B);
+
+    Entry a;
+    Entry b;
+
+    int col_A;
+    int col_B;
+
+    int val_A;
+    int val_B;
     
     while((index(A) >= 0) && (index(B) >= 0)){
 
-        Entry a = (Entry)get(A);
-        Entry b = (Entry)get(B);
+         a = (Entry)get(A);
+         b = (Entry)get(B);
 
-        int col_A = a->col;
-        int col_B = b->col;
+         col_A = a->col;
+         col_B = b->col;
 
-        int val_A = a->value;
-        int val_B = b->value;
+         val_A = a->value;
+         val_B = b->value;
 
         if (col_A == col_B){
             if ((val_A + val_B) != 0){
@@ -407,17 +417,64 @@ void add(List A, List B, List Result){
             moveNext(B);
         }
         else if(col_A < col_B){
-            while(index(A)>=0){
+            while((index(A)>=0) && (col_A < col_B)){
+
+                a = (Entry)get(A);
+                col_A = a->col;
+                val_A = a->value;
+
+
                 append(Result, newEntry(col_A, val_A));
                 moveNext(A);
+
+                a = (Entry)get(A);
+                col_A = a->col;
+                val_A = a->value;
+
+                
+                
             }
         }
         else{
-            while(index(B)>=0){
+            while((index(B)>=0) && ((col_A < col_B))){
+
+                b = (Entry)get(B);
+                col_B = b->col;
+                val_B = b->value;
+
                 append(Result, newEntry(col_B, val_B));
                 moveNext(B);
+
+                b = (Entry)get(B);
+                col_B = b->col;
+                val_B = b->value;
+
+                
             }   
         }
+    }
+
+    while(index(B)>=0 ){
+
+        b = (Entry)get(B);
+        col_B = b->col;
+        val_B = b->value;
+
+        append(Result, newEntry(col_B, val_B));
+        moveNext(B);
+
+        
+
+    }
+
+    while(index(A)>=0 ){
+
+        a = (Entry)get(A);
+        col_A = a->col;
+        val_A = a->value;
+
+        append(Result, newEntry(col_A, val_A));
+        moveNext(A);
     }
 }
 
@@ -466,7 +523,7 @@ void sub(List A, List B, List Result){
 Matrix sum(Matrix A, Matrix B){
 
     if (equals(A, B)){
-        printf("is equal\n");
+        
         return scalarMult(2, A);
     }
 
