@@ -129,6 +129,9 @@ int main(int argc, char* argv[]){
    moveBack(L2);
    printf("\nValue: %d\n", *(int*)get(L2));
 
+   freeList(&L);
+   freeList(&L2);
+
 
 
    
