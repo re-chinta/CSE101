@@ -256,6 +256,7 @@ void List::eraseBefore(){
 
 
 
+
     beforeCursor = afterCursor -> prev -> prev;
     afterCursor -> prev = beforeCursor;
     beforeCursor -> next = afterCursor;
@@ -285,18 +286,15 @@ int List::findNext(ListElement x){
         afterCursor = afterCursor -> next;
 
         pos_cursor ++;
-        
-
-
-        
+    
 
         if (beforeCursor -> data == x){
+            
+
             return pos_cursor;
         }
 
-        
 
-        
     }
 
     return -1;
@@ -313,13 +311,13 @@ int List::findPrev(ListElement x){
 
     while (pos_cursor > 0){
 
-        if ((beforeCursor -> data) == x){
-            return pos_cursor -1 ;
-        }
-
         beforeCursor = beforeCursor -> prev;
         afterCursor = afterCursor -> prev;
         pos_cursor--;
+
+        if ((afterCursor -> data) == x){
+            return pos_cursor ;
+        }
 
     }
 
@@ -335,6 +333,8 @@ int List::findPrev(ListElement x){
 // is not moved with respect to the retained elements, i.e. it lies between 
 // the same two retained elements that it did before cleanup() was called.
 void List::cleanup(){
+
+
 
 
 
