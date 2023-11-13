@@ -368,29 +368,36 @@ void List::cleanup(){
         if (elements.findNext(temp->data) > -1){
 
             if (temp == beforeCursor){
+                temp = temp -> next;
+                
                 eraseBefore();
+                
             }
             else if (temp == afterCursor){
+                temp = temp -> next;
+                
                 eraseAfter();
+                
             }
-            // else if (temp -> prev == afterCursor){
-
-
-            // }
-            // else if(temp -> next == beforeCursor){
-
-            // }
+            
             else{
 
                 if (index-1 <= position()){
                     pos_cursor--;
                 }
 
+                Node* N = temp;
+
 
 
                 temp -> prev -> next = temp -> next;
                 temp -> next -> prev = temp -> prev;
+
+                
+                
                 num_elements--;
+                temp = temp -> next;
+                delete N;
 
             }
 
@@ -398,10 +405,11 @@ void List::cleanup(){
         }
         else{
             elements.insertAfter(temp->data);
+            temp = temp -> next;
             
         }
 
-        temp = temp -> next;
+        
 
         index++;
 

@@ -7,11 +7,12 @@
 #include<string>
 #include<stdexcept>
 #include"List.h"
+#include <iomanip>
 
 using namespace std;
 
 void shuffle(List& D){
-    cout << "D = " << D << endl;
+    //cout << "D = " << D << endl;
     int len = D.length();
 
     D.moveFront();
@@ -27,13 +28,13 @@ void shuffle(List& D){
         D.moveNext();
 
     }
-    cout << "A = " << A << endl;
+    //cout << "A = " << A << endl;
 
     for(int j=0; j<(len-count); j++){
         B.insertBefore(D.peekPrev());
         D.moveNext();
     }
-    cout << "B = " << B << endl;
+    //cout << "B = " << B << endl;
 
     A.moveFront();
     B.moveFront();
@@ -61,7 +62,7 @@ void shuffle(List& D){
         
     }
 
-    cout << "D = " << D << endl;
+    //cout << "D = " << D << endl;
 
 
 
@@ -77,13 +78,21 @@ int main(int argc, char* argv[]){
       printf("Usage: %s [num]\n", argv[0]);
       exit(1);
    }
+
+   cout << "deck size       " <<"shuffle count" << endl;
+    cout << "------------------------------" << endl;
     
     
     int n = stoi(argv[1]);
 
+
+
+
+    for (int k = 1; k <= n; k++){
+
     List A;
 
-    for(int i=0; i<n; i++){
+    for(int i=0; i<k; i++){
         A.insertAfter(n-(i+1));
     }
 
@@ -98,8 +107,8 @@ int main(int argc, char* argv[]){
         num_shuffles++;
 
         shuffle(A);
-        cout << "A = " << A << endl;
-        cout << "B = " << B << endl;
+        //cout << "A = " << A << endl;
+        //cout << "B = " << B << endl;
 
 
         
@@ -113,23 +122,14 @@ int main(int argc, char* argv[]){
     // shuffle(A);
     // shuffle(A);
 
-    cout << "num: " << num_shuffles << endl;
-
-
-
-
-
-
-
-
-
-
+    std::cout << std::setw(16) << std::left <<  k << std::setw(16) << std::left << num_shuffles << std::endl;
 
     
 
 
+}
 
-
+cout << endl;
 
 
 
