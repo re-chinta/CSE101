@@ -43,17 +43,21 @@ List::List(const List& L){
    backDummy -> prev = frontDummy;
 
    // load elements of L into this List
-   Node* N = L.frontDummy;
-   while( N!=nullptr ){
+   Node* N = (L.frontDummy) ->next;
+   while( (N->next)!=nullptr ){
       this->insertBefore(N->data);
       N = N->next;
    }
+
+   
 }
 
 // Destructor
 
 List::~List(){
     clear();
+    delete frontDummy;
+    delete backDummy;
 }
 
 
@@ -62,6 +66,7 @@ List::~List(){
 // length()
 // Returns the length of this List.
 int List::length() const{
+
     return num_elements;
 }
 
@@ -106,6 +111,14 @@ ListElement List::peekPrev() const{
 // Deletes all elements in this List, setting it to the empty state.
 void List::clear()
 {
+
+    moveFront();
+    while (length() > 0){
+        eraseAfter();
+    }
+    
+    
+
 
 }
 
@@ -187,8 +200,7 @@ void List::insertAfter(ListElement x){
     afterCursor = N;
 
     num_elements++;
-
-
+    
 }
 
 // insertBefore()
@@ -239,9 +251,13 @@ void List::eraseAfter(){
     // afterCursor = afterCursor -> next;
     // afterCursor -> prev = beforeCursor;
 
+    Node* N = afterCursor;
+
     afterCursor = beforeCursor -> next -> next;
     beforeCursor -> next = afterCursor;
     afterCursor -> prev = beforeCursor;
+
+    delete N;
 
     num_elements --;
 
@@ -254,12 +270,16 @@ void List::eraseAfter(){
 // pre: position()>0
 void List::eraseBefore(){
 
+    Node* N = beforeCursor;
+
 
 
 
     beforeCursor = afterCursor -> prev -> prev;
     afterCursor -> prev = beforeCursor;
     beforeCursor -> next = afterCursor;
+
+    delete N;
 
     
 
@@ -333,6 +353,60 @@ int List::findPrev(ListElement x){
 // is not moved with respect to the retained elements, i.e. it lies between 
 // the same two retained elements that it did before cleanup() was called.
 void List::cleanup(){
+
+    List elements;
+
+
+
+    Node* temp = frontDummy -> next;
+
+    int index = 0;
+
+    while (temp != backDummy){
+        elements.moveFront();
+
+        if (elements.findNext(temp->data) > -1){
+
+            if (temp == beforeCursor){
+                eraseBefore();
+            }
+            else if (temp == afterCursor){
+                eraseAfter();
+            }
+            // else if (temp -> prev == afterCursor){
+
+
+            // }
+            // else if(temp -> next == beforeCursor){
+
+            // }
+            else{
+
+                if (index-1 <= position()){
+                    pos_cursor--;
+                }
+
+
+
+                temp -> prev -> next = temp -> next;
+                temp -> next -> prev = temp -> prev;
+                num_elements--;
+
+            }
+
+
+        }
+        else{
+            elements.insertAfter(temp->data);
+            
+        }
+
+        temp = temp -> next;
+
+        index++;
+
+
+    }
 
 
 
