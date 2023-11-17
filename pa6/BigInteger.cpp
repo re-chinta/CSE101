@@ -1,0 +1,338 @@
+/*Reema Chintala  
+rechinta  
+PA6*/  
+
+#include<iostream>
+#include<string>
+#include<stdexcept>
+#include"List.h"
+#include"BigInteger.h"
+
+using namespace std;
+
+
+//CHANGE BEFORE SUBMITTING
+
+const int base = 1000;
+const int power = 3;
+
+// Exported type  -------------------------------------------------------------
+
+
+
+
+
+// Class Constructors & Destructors ----------------------------------------
+
+// BigInteger()
+// Constructor that creates a new BigInteger in the zero state: 
+// signum=0, digits=().
+BigInteger::BigInteger(){
+
+    signum=0;
+    digits = List();
+
+}
+
+// BigInteger()
+// Constructor that creates a new BigInteger from the long value x.
+BigInteger::BigInteger(long x){
+
+   digits = List();
+
+   if (x > 0){
+      signum=1;
+   }
+   else if (x < 0){
+      signum=-1;
+   }
+   else{
+      signum=0;
+   }
+
+   x = abs(x);
+
+
+   while (x > base){
+
+      digits.insertBefore(x % base);
+      digits.movePrev();
+      x = x / base;
+      
+   }
+
+}
+
+// BigInteger()
+// Constructor that creates a new BigInteger from the string s.
+// Pre: s is a non-empty string consisting of (at least one) base 10 digit
+// {0,1,2,3,4,5,6,7,8,9}, and an optional sign {+,-} prefix.
+BigInteger::BigInteger(std::string s){
+
+   digits = List();
+
+   if (s.size() == 0){
+      throw std::invalid_argument("Value must not be an empty string");
+   }
+
+   string::size_type ch = s.find_first_not_of("+-0123456789"); 
+   
+   if (ch != std::string::npos) {
+      throw std::invalid_argument("Value is invalid");
+   } 
+
+   string::size_type plus_minus = s.substr(1, s.size()-1).find_first_not_of("0123456789"); 
+   if (plus_minus != std::string::npos) {
+      throw std::invalid_argument("plus/minus must be in front");
+   } 
+
+   if (s[0] == '-'){
+      signum=-1;
+   }
+   // else if (s[0] == "+"){
+   //    signum=1;
+   // }
+   else{
+
+      string::size_type zero = s.find_first_not_of("0"); 
+      if (ch == std::string::npos) {
+         signum=0;
+      }
+      else{
+         signum=1;
+      }
+   }
+
+   // int firstDigits;
+   // int num_dig = 0;
+   // int index = 0;
+
+   // if (s[0] == '+' || s[0] == '-' ){
+   //    firstDigits = (s.size()-1)%power;
+   //    digits.insertBefore(stol(s.substr(1, firstDigits)));
+   //    digits.movePrev();
+   //    num_dig = s.size()-1-firstDigits;
+   //    index = 1;
+
+   // }
+   // else{
+   //    firstDigits = s.size()%power;
+   //    digits.insertBefore(stol(s.substr(0, firstDigits)));
+   //    digits.movePrev();
+   //    num_dig = s.size()-firstDigits;
+   //    index = 0;
+
+   // }
+
+   //int iterations = num_dig/power;
+
+   
+   
+   while (s.length() > 0){
+      if (s.length()>=power){
+         digits.insertAfter(stol(s.substr(s.length() - 3, power)));
+         cout << stol(s.substr(s.length() - 3, power)) << endl;
+         s.erase(s.length() - 3, power);
+
+      }
+      else{
+         digits.insertAfter(stol(s));
+         cout << stol(s) << endl;
+         s.erase();
+      }
+   }
+
+   //cout << digits.length() << endl;
+
+
+
+
+
+   
+
+   // for (int i = 0; i < (num_dig/power); i++){
+
+   //    cout << digits.length() << endl;
+
+     
+
+   //    digits.insertAfter(stol(s.substr(index, power)));
+
+   //    index += power;
+
+   // }
+
+
+}
+
+// BigInteger()
+// Constructor that creates a copy of N.
+BigInteger::BigInteger(const BigInteger& N){
+
+}
+
+// Optional Destuctor
+// ~BigInteger()
+// ~BigInteger();
+
+
+// Access functions --------------------------------------------------------
+
+// sign()
+   // Returns -1, 1 or 0 according to whether this BigInteger is positive, 
+   // negative or 0, respectively.
+int BigInteger::sign() const{
+
+}
+
+   // compare()
+   // Returns -1, 1 or 0 according to whether this BigInteger is less than N,
+   // greater than N or equal to N, respectively.
+int BigInteger::compare(const BigInteger& N) const{
+
+   }
+
+
+   // Manipulation procedures -------------------------------------------------
+
+   // makeZero()
+   // Re-sets this BigInteger to the zero state.
+void BigInteger::makeZero(){
+
+   }
+
+   // negate()
+   // If this BigInteger is zero, does nothing, otherwise reverses the sign of 
+   // this BigInteger positive <--> negative. 
+void BigInteger::negate(){
+
+   }
+
+
+   // BigInteger Arithmetic operations ----------------------------------------
+
+   // add()
+   // Returns a BigInteger representing the sum of this and N.
+ BigInteger BigInteger::add(const BigInteger& N) const{
+
+   }
+
+   // sub()
+   // Returns a BigInteger representing the difference of this and N.
+   BigInteger BigInteger::sub(const BigInteger& N) const{
+
+   }
+
+   // mult()
+   // Returns a BigInteger representing the product of this and N. 
+   BigInteger BigInteger::mult(const BigInteger& N) const{
+
+   }
+
+
+// Other Functions ---------------------------------------------------------
+
+// to_string()
+// Returns a string representation of this BigInteger consisting of its
+// base 10 digits. If this BigInteger is negative, the returned string 
+// will begin with a negative sign '-'. If this BigInteger is zero, the
+// returned string will consist of the character '0' only.
+std::string BigInteger::to_string(){
+
+   digits.moveFront();
+
+   std::string s = "";
+
+   //cout << digits.length() << endl;
+    
+   while (digits.position() < digits.length()){
+
+      cout << "hello" << endl;
+      
+      s += std::to_string(digits.peekNext());
+      digits.moveNext();
+ 
+   }
+    
+   return s;
+   
+}
+
+
+// Overriden Operators -----------------------------------------------------
+   
+// operator<<()
+// Inserts string representation of N into stream.
+std::ostream& operator<<( std::ostream& stream, BigInteger N ){
+   
+   return stream << N.to_string();
+ 
+}
+
+   // operator==()
+   // Returns true if and only if A equals B. 
+      bool operator==( const BigInteger& A, const BigInteger& B ){
+
+      }
+
+   // operator<()
+   // Returns true if and only if A is less than B. 
+bool operator<( const BigInteger& A, const BigInteger& B ){
+
+}
+
+   // operator<=()
+   // Returns true if and only if A is less than or equal to B. 
+ bool operator<=( const BigInteger& A, const BigInteger& B ){
+
+ }
+
+   // operator>()
+   // Returns true if and only if A is greater than B. 
+bool operator>( const BigInteger& A, const BigInteger& B ){
+
+}
+
+   // operator>=()
+   // Returns true if and only if A is greater than or equal to B. 
+     bool operator>=( const BigInteger& A, const BigInteger& B ){
+
+     }
+
+   // operator+()
+   // Returns the sum A+B. 
+      BigInteger operator+( const BigInteger& A, const BigInteger& B ){
+
+      }
+
+   // operator+=()
+   // Overwrites A with the sum A+B. 
+      BigInteger operator+=( BigInteger& A, const BigInteger& B ){
+
+      }
+
+   // operator-()
+   // Returns the difference A-B. 
+      BigInteger operator-( const BigInteger& A, const BigInteger& B ){
+
+      }
+
+
+   // operator-=()
+   // Overwrites A with the difference A-B. 
+      BigInteger operator-=( BigInteger& A, const BigInteger& B ){
+
+      }
+
+   // operator*()
+   // Returns the product A*B. 
+      BigInteger operator*( const BigInteger& A, const BigInteger& B ){
+
+      }
+
+   // operator*=()
+   // Overwrites A with the product A*B. 
+      BigInteger operator*=( BigInteger& A, const BigInteger& B ){
+
+      }
+
