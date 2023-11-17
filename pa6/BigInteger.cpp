@@ -142,32 +142,17 @@ BigInteger::BigInteger(std::string s){
       }
    }
 
-   //cout << digits.length() << endl;
-
-
-
-
-
+   cout << "length is " << digits.length() << endl;
    
-
-   // for (int i = 0; i < (num_dig/power); i++){
-
-   //    cout << digits.length() << endl;
-
-     
-
-   //    digits.insertAfter(stol(s.substr(index, power)));
-
-   //    index += power;
-
-   // }
-
 
 }
 
 // BigInteger()
 // Constructor that creates a copy of N.
 BigInteger::BigInteger(const BigInteger& N){
+   
+   signum=N.sign();
+   digits = N.digits;
 
 }
 
@@ -179,43 +164,99 @@ BigInteger::BigInteger(const BigInteger& N){
 // Access functions --------------------------------------------------------
 
 // sign()
-   // Returns -1, 1 or 0 according to whether this BigInteger is positive, 
-   // negative or 0, respectively.
+// Returns -1, 1 or 0 according to whether this BigInteger is positive, 
+// negative or 0, respectively.
 int BigInteger::sign() const{
+
+   return signum;
 
 }
 
-   // compare()
-   // Returns -1, 1 or 0 according to whether this BigInteger is less than N,
-   // greater than N or equal to N, respectively.
+// compare()
+// Returns -1, 1 or 0 according to whether this BigInteger is less than N,
+// greater than N or equal to N, respectively.
 int BigInteger::compare(const BigInteger& N) const{
 
+   int comp;
+
+   if (digits == N.digits || (signum == 0 && N.signum == 0) ){
+      return 0;
+   }
+   
+
+   if (signum != N.signum){
+      if (signum > N.signum){
+         return 1;
+      }
+      else{
+         return -1;
+      }
+
    }
 
+   List A = digits;
+   List B = N.digits;
 
-   // Manipulation procedures -------------------------------------------------
+   if (A.length() > B.length()){
 
-   // makeZero()
-   // Re-sets this BigInteger to the zero state.
+      return 1;
+   }
+   else if (A.length() < B.length()){
+      return -1;
+
+   }
+   else{
+
+      
+
+      A.moveFront();
+      B.moveFront();
+
+      while (A.position() != A.length()){
+         if (A.peekNext() > B.peekNext()){
+            return 1;
+         }
+         else if (A.peekNext() < B.peekNext()){
+            return -1;
+         }
+
+         A.moveNext();
+         B.moveNext();
+
+      }
+
+   }
+}
+
+
+// Manipulation procedures -------------------------------------------------
+
+// makeZero()
+// Re-sets this BigInteger to the zero state.
 void BigInteger::makeZero(){
 
-   }
+   signum = 0;
+   digits.clear();
 
-   // negate()
-   // If this BigInteger is zero, does nothing, otherwise reverses the sign of 
-   // this BigInteger positive <--> negative. 
+}
+
+// negate()
+// If this BigInteger is zero, does nothing, otherwise reverses the sign of 
+// this BigInteger positive <--> negative. 
 void BigInteger::negate(){
 
-   }
+   signum = -signum;
+
+}
 
 
-   // BigInteger Arithmetic operations ----------------------------------------
+// BigInteger Arithmetic operations ----------------------------------------
 
-   // add()
-   // Returns a BigInteger representing the sum of this and N.
- BigInteger BigInteger::add(const BigInteger& N) const{
+// add()
+// Returns a BigInteger representing the sum of this and N.
+BigInteger BigInteger::add(const BigInteger& N) const{
 
-   }
+}
 
    // sub()
    // Returns a BigInteger representing the difference of this and N.
@@ -237,27 +278,41 @@ void BigInteger::negate(){
 // base 10 digits. If this BigInteger is negative, the returned string 
 // will begin with a negative sign '-'. If this BigInteger is zero, the
 // returned string will consist of the character '0' only.
-std::string BigInteger::to_string(){
+std::string BigInteger::to_string() {
+
 
    digits.moveFront();
 
    std::string s = "";
 
-   //cout << digits.length() << endl;
+   
     
    while (digits.position() < digits.length()){
 
-      cout << "hello" << endl;
+      int count = 0;
+
+      if (std::to_string(digits.peekNext()).size() < power){
+
+         if (digits.position() > 0){
+   
+            count = power - std::to_string(digits.peekNext()).size();
+
+            for (int i = 0; i < count; i++){
+               s += std::to_string(0);
+
+            }
+            
+         }
+      }
       
       s += std::to_string(digits.peekNext());
       digits.moveNext();
  
-   }
-    
+   } 
    return s;
    
 }
-
+ 
 
 // Overriden Operators -----------------------------------------------------
    
@@ -275,9 +330,15 @@ std::ostream& operator<<( std::ostream& stream, BigInteger N ){
 
       }
 
-   // operator<()
-   // Returns true if and only if A is less than B. 
+// operator<()
+// Returns true if and only if A is less than B. 
 bool operator<( const BigInteger& A, const BigInteger& B ){
+
+   if (A.compare(B) == -1){
+      return true;
+   }
+
+   return false;
 
 }
 
@@ -285,44 +346,65 @@ bool operator<( const BigInteger& A, const BigInteger& B ){
    // Returns true if and only if A is less than or equal to B. 
  bool operator<=( const BigInteger& A, const BigInteger& B ){
 
+   if (A.compare(B) <= 0){
+      return true;
+   }
+
+   return false;
+
+
  }
 
-   // operator>()
-   // Returns true if and only if A is greater than B. 
+// operator>()
+// Returns true if and only if A is greater than B. 
 bool operator>( const BigInteger& A, const BigInteger& B ){
+
+   if (A.compare(B) == 1){
+      return true;
+   }
+
+   return false;
+
+
 
 }
 
-   // operator>=()
-   // Returns true if and only if A is greater than or equal to B. 
-     bool operator>=( const BigInteger& A, const BigInteger& B ){
+// operator>=()
+// Returns true if and only if A is greater than or equal to B. 
+bool operator>=( const BigInteger& A, const BigInteger& B ){
 
-     }
+   if (A.compare(B) >= 0){
+      return true;
+   }
 
-   // operator+()
-   // Returns the sum A+B. 
-      BigInteger operator+( const BigInteger& A, const BigInteger& B ){
+   return false;
 
-      }
+}
 
-   // operator+=()
-   // Overwrites A with the sum A+B. 
-      BigInteger operator+=( BigInteger& A, const BigInteger& B ){
+// operator+()
+// Returns the sum A+B. 
+BigInteger operator+( const BigInteger& A, const BigInteger& B ){
 
-      }
+}
 
-   // operator-()
-   // Returns the difference A-B. 
-      BigInteger operator-( const BigInteger& A, const BigInteger& B ){
+// operator+=()
+// Overwrites A with the sum A+B. 
+BigInteger operator+=( BigInteger& A, const BigInteger& B ){
 
-      }
+}
+
+// operator-()
+// Returns the difference A-B. 
+BigInteger operator-( const BigInteger& A, const BigInteger& B ){
+
+}
 
 
-   // operator-=()
-   // Overwrites A with the difference A-B. 
-      BigInteger operator-=( BigInteger& A, const BigInteger& B ){
+// operator-=()
+// Overwrites A with the difference A-B. 
+BigInteger operator-=( BigInteger& A, const BigInteger& B ){
 
-      }
+}
 
    // operator*()
    // Returns the product A*B. 
