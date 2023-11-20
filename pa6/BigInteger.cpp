@@ -21,7 +21,6 @@ const int power = 3;
 
 
 
-
 // Class Constructors & Destructors ----------------------------------------
 
 // BigInteger()
@@ -68,6 +67,7 @@ BigInteger::BigInteger(long x){
 // Pre: s is a non-empty string consisting of (at least one) base 10 digit
 // {0,1,2,3,4,5,6,7,8,9}, and an optional sign {+,-} prefix.
 BigInteger::BigInteger(std::string s){
+   
 
    digits = List();
 
@@ -89,14 +89,15 @@ BigInteger::BigInteger(std::string s){
    if (s[0] == '-'){
       signum=-1;
    }
-   // else if (s[0] == "+"){
-   //    signum=1;
-   // }
+   else if (s[0] == '+'){
+      signum=1;
+   }
    else{
 
       string::size_type zero = s.find_first_not_of("0"); 
-      if (ch == std::string::npos) {
+      if (zero == std::string::npos) {
          signum=0;
+         
       }
       else{
          signum=1;
@@ -131,18 +132,17 @@ BigInteger::BigInteger(std::string s){
    while (s.length() > 0){
       if (s.length()>=power){
          digits.insertAfter(stol(s.substr(s.length() - 3, power)));
-         cout << stol(s.substr(s.length() - 3, power)) << endl;
+         //cout << stol(s.substr(s.length() - 3, power)) << endl;
          s.erase(s.length() - 3, power);
 
       }
       else{
          digits.insertAfter(stol(s));
-         cout << stol(s) << endl;
+         // << stol(s) << endl;
          s.erase();
       }
    }
 
-   cout << "length is " << digits.length() << endl;
    
 
 }
@@ -177,19 +177,22 @@ int BigInteger::sign() const{
 // greater than N or equal to N, respectively.
 int BigInteger::compare(const BigInteger& N) const{
 
-   int comp;
 
-   if (digits == N.digits || (signum == 0 && N.signum == 0) ){
+   if ((digits == N.digits) || (signum == 0 && N.signum == 0) ){
+
       return 0;
+
    }
    
 
    if (signum != N.signum){
       if (signum > N.signum){
          return 1;
+         
       }
       else{
          return -1;
+         
       }
 
    }
@@ -200,6 +203,7 @@ int BigInteger::compare(const BigInteger& N) const{
    if (A.length() > B.length()){
 
       return 1;
+      
    }
    else if (A.length() < B.length()){
       return -1;
@@ -214,9 +218,12 @@ int BigInteger::compare(const BigInteger& N) const{
 
       while (A.position() != A.length()){
          if (A.peekNext() > B.peekNext()){
+            
             return 1;
+            
          }
          else if (A.peekNext() < B.peekNext()){
+            
             return -1;
          }
 
@@ -226,6 +233,8 @@ int BigInteger::compare(const BigInteger& N) const{
       }
 
    }
+
+   return 999;
 }
 
 
@@ -252,23 +261,169 @@ void BigInteger::negate(){
 
 // BigInteger Arithmetic operations ----------------------------------------
 
+
+
+
+
 // add()
 // Returns a BigInteger representing the sum of this and N.
 BigInteger BigInteger::add(const BigInteger& N) const{
 
+
+
+   BigInteger A = *this;
+   BigInteger B = N;
+
+   cout << A << endl;
+   cout << B << endl;
+
+   List LA = A.digits;
+   List LB = B.digits;
+
+   LA.moveFront();
+   LB.moveFront();
+
+  
+   while (LA.length() > LB.length()){
+
+      LB.insertBefore(0);
+
+   }
+   while (LA.length() < LB.length()){
+
+      LA.insertBefore(0);
+      
+   }
+
+   LA.moveBack();
+   LB.moveBack();
+
+   BigInteger C = BigInteger();
+
+   long sum;
+
+   for (int i = 0; i < LA.length(); i ++){
+
+      sum = (A.sign() * LA.peekPrev()) + (B.sign() * LB.peekPrev());
+      C.digits.insertAfter(sum);
+      LA.movePrev();
+      LB.movePrev();
+
+
+   }
+
+
+   cout << LA << endl;
+   cout << LB << endl;
+   cout << C.digits << endl;
+   
+
+
+
+
+
+   //NORMALIZE
+
+   if (C.digits.length() == 0){
+      C.signum = 0;
+      return C;
+   }
+
+   C.digits.moveFront();
+
+   while (C.digits.peekNext() == 0){
+
+      C.digits.eraseAfter();
+   }
+
+   if (C.digits.length() == 0){
+      C.signum = 0;
+      return C;
+   }
+
+   if (C.digits.front() < 0){
+      C.signum = -1;
+   }
+   else if (C.digits.front() > 0){
+      //cout << "positive" << endl;
+
+      C.signum = 1;
+   }
+
+   int len = C.digits.length();
+
+
+   C.digits.moveBack();
+
+   ListElement carry = 0;
+
+   for (int x = 0; x < len; x ++){
+
+      ListElement data = C.digits.peekPrev() + carry;
+      C.digits.setBefore(data);
+      C.digits.movePrev();
+      carry = 0;
+      
+      
+      // if (data < 0){
+      //    carry = data/base - 1;
+      //    data -= carry + base;
+      //    if (x == length - 1){
+      //       setAfter()
+      //    }
+      // }
+
+      if (data >= base){
+         
+         carry = data / base;
+         data -= base;
+         C.digits.setAfter(data);
+        
+         if (x == len - 1 ){
+
+            C.digits.insertAfter(carry);
+            C.digits.moveFront();
+
+            //cout << C.digits << endl;
+
+            return C;
+         }
+      }
+
+      
+
+   }
+
+   cout << C << endl;
+
+
+
+
+   return N;
+
+
+
 }
 
-   // sub()
-   // Returns a BigInteger representing the difference of this and N.
-   BigInteger BigInteger::sub(const BigInteger& N) const{
 
-   }
 
-   // mult()
-   // Returns a BigInteger representing the product of this and N. 
-   BigInteger BigInteger::mult(const BigInteger& N) const{
+// sub()
+// Returns a BigInteger representing the difference of this and N.
+BigInteger BigInteger::sub(const BigInteger& N) const{
 
-   }
+   return N;
+
+}
+
+// mult()
+// Returns a BigInteger representing the product of this and N. 
+BigInteger BigInteger::mult(const BigInteger& N) const{
+
+   return N;
+
+   
+
+}
 
 
 // Other Functions ---------------------------------------------------------
@@ -324,11 +479,20 @@ std::ostream& operator<<( std::ostream& stream, BigInteger N ){
  
 }
 
-   // operator==()
-   // Returns true if and only if A equals B. 
-      bool operator==( const BigInteger& A, const BigInteger& B ){
+// operator==()
+// Returns true if and only if A equals B. 
+bool operator==( const BigInteger& A, const BigInteger& B ){
 
-      }
+   //cout << "hi" << endl;
+
+   if (A.compare(B) == 0){
+      //cout << "hhi" << endl;
+      return true;
+   }
+
+   return false;
+
+}
 
 // operator<()
 // Returns true if and only if A is less than B. 
@@ -340,11 +504,13 @@ bool operator<( const BigInteger& A, const BigInteger& B ){
 
    return false;
 
+   
+
 }
 
-   // operator<=()
-   // Returns true if and only if A is less than or equal to B. 
- bool operator<=( const BigInteger& A, const BigInteger& B ){
+// operator<=()
+// Returns true if and only if A is less than or equal to B. 
+bool operator<=( const BigInteger& A, const BigInteger& B ){
 
    if (A.compare(B) <= 0){
       return true;
@@ -352,8 +518,7 @@ bool operator<( const BigInteger& A, const BigInteger& B ){
 
    return false;
 
-
- }
+}
 
 // operator>()
 // Returns true if and only if A is greater than B. 
@@ -364,8 +529,6 @@ bool operator>( const BigInteger& A, const BigInteger& B ){
    }
 
    return false;
-
-
 
 }
 
@@ -385,36 +548,50 @@ bool operator>=( const BigInteger& A, const BigInteger& B ){
 // Returns the sum A+B. 
 BigInteger operator+( const BigInteger& A, const BigInteger& B ){
 
+   return A.add(B);
+
 }
 
 // operator+=()
 // Overwrites A with the sum A+B. 
 BigInteger operator+=( BigInteger& A, const BigInteger& B ){
+   return A;
 
 }
 
 // operator-()
 // Returns the difference A-B. 
 BigInteger operator-( const BigInteger& A, const BigInteger& B ){
+   return A;
 
 }
+
 
 
 // operator-=()
 // Overwrites A with the difference A-B. 
 BigInteger operator-=( BigInteger& A, const BigInteger& B ){
+   return A;
 
 }
 
-   // operator*()
-   // Returns the product A*B. 
-      BigInteger operator*( const BigInteger& A, const BigInteger& B ){
 
-      }
 
-   // operator*=()
-   // Overwrites A with the product A*B. 
-      BigInteger operator*=( BigInteger& A, const BigInteger& B ){
+// operator*()
+// Returns the product A*B. 
+BigInteger operator*( const BigInteger& A, const BigInteger& B ){
 
-      }
+   return A;
+
+}
+
+
+
+// operator*=()
+// Overwrites A with the product A*B. 
+BigInteger operator*=( BigInteger& A, const BigInteger& B ){
+
+   return A;
+
+}
 
