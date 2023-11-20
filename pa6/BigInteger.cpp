@@ -319,9 +319,6 @@ BigInteger BigInteger::add(const BigInteger& N) const{
    
 
 
-
-
-
    //NORMALIZE
 
    if (C.digits.length() == 0){
@@ -365,13 +362,18 @@ BigInteger BigInteger::add(const BigInteger& N) const{
       carry = 0;
       
       
-      // if (data < 0){
-      //    carry = data/base - 1;
-      //    data -= carry + base;
-      //    if (x == length - 1){
-      //       setAfter()
-      //    }
-      // }
+      if (data < 0){
+         carry = data/base - 1;
+         data -= carry + base;
+         C.digits.setAfter(data);
+
+
+         if (x == len - 1){
+            
+            C.digits.insertAfter(carry);
+            C.digits.moveFront();
+         }
+      }
 
       if (data >= base){
          
@@ -397,8 +399,6 @@ BigInteger BigInteger::add(const BigInteger& N) const{
    cout << C << endl;
 
 
-
-
    return N;
 
 
@@ -419,9 +419,83 @@ BigInteger BigInteger::sub(const BigInteger& N) const{
 // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const{
 
-   return N;
+   List one = digits;
+   List list_n = N.digits;
+   List list_this = digits;
 
-   
+
+   BigInteger i = BigInteger();
+
+   if (sign() == 0 || N.sign() == 0){
+      return i;
+   }
+   if (sign() != N.sign()){
+      i.signum = -1;
+   } 
+   else{
+      i.signum = 1;
+   }
+
+   list_n.moveBack();
+
+
+   for (int x=0 ; x < list_n.length(); x++){
+
+      ListElement mult = list_n.peekPrev();
+      list_n.movePrev();
+
+      for (int y = 0; y < list_this.length(); y ++){
+         ListElement sum = mult * list_this.moveNext();
+         list_this.setBefore(sum);
+      }
+
+      list_this.moveBack();
+
+
+      for (int y = 0; y < x; y ++){
+         list_this.insertAfter(0);
+
+      }
+
+      List holder = List();
+
+      list_this.moveFront();
+      i.digits.moveFront();
+
+      while (list_this.length() > i.digits.length()){
+
+         i.digits.insertBefore(0);
+
+      }
+      while (list_this.length() < i.digits.length()){
+
+         list_this.insertBefore(0);
+
+      }
+
+      list_this.moveBack();
+      i.digits.moveBack();
+
+      for (int b = 0; b < list_this.length(); b ++){
+
+         ListElement sum = i.digits.peekPrev() + list_this.peekPrev();
+         i.digits.movePrev();
+         list_this.movePrev();
+
+         holder.insertAfter(sum);
+
+      }
+
+      //normalize(holder)
+      i.digits = holder;
+
+
+
+
+   }
+
+   return i;
+
 
 }
 
