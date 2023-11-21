@@ -172,15 +172,8 @@ int BigInteger::sign() const{
 // greater than N or equal to N, respectively.
 int BigInteger::compare(const BigInteger& N) const{
 
-
-   if ((digits == N.digits) || (signum == 0 && N.signum == 0) ){
-
-      return 0;
-
-   }
-   
-
    if (signum != N.signum){
+      
       if (signum > N.signum){
          return 1;
          
@@ -191,6 +184,19 @@ int BigInteger::compare(const BigInteger& N) const{
       }
 
    }
+
+
+   if ((digits == N.digits) || (signum == 0 && N.signum == 0) ){
+
+
+      return 0;
+
+   }
+
+   
+   
+
+   
 
    List A = digits;
    List B = N.digits;
@@ -482,7 +488,7 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       }
 
-      cout << list_this << endl;
+     
 
       list_this.moveBack();
 
@@ -491,7 +497,7 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       }
 
-      cout << list_this << endl;
+
 
       List holder = List();
 
@@ -524,9 +530,9 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       }
 
-      //cout << "before normalize: " << holder << endl;
+      
       normalize(holder);
-      //cout << "after normalize: " << holder << endl;
+    
       i.digits = holder;
 
    }
