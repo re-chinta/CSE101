@@ -318,7 +318,7 @@ int normalize(List& digits){
       ListElement data = digits.movePrev();
 
       data += carry;
-      
+      carry = 0;
    
       
       if (data < 0){
@@ -456,8 +456,8 @@ void shift(List& digits, int p){
 
 List scalar(List L, long s){
 
-   cout << L <<endl;
-   cout << s <<endl;
+   //cout << L <<endl;
+   //cout << s <<endl;
    List digits = L;
    digits.moveFront();
    for (int i = 0; i < digits.length(); i ++){
@@ -493,11 +493,11 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
    for (int i = 0; i < B.digits.length(); i++){
 
-      cout << "N.digits: " << N.digits << endl;
+      //cout << "N.digits: " << N.digits << endl;
 
       List scale = scalar(N.digits, B.digits.movePrev());
 
-      cout << "scalar: " << scale << endl;
+      //cout << "scalar: " << scale << endl;
 
       shift(scale, i);
 
@@ -505,9 +505,11 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       sumList(scale, sum_copy, running_sum, 1, 1);
 
+      //cout << "before normalize: " << running_sum << endl;
+
       normalize(running_sum);
 
-      cout << running_sum << endl;
+      //cout << "running sum: " << running_sum << endl;
 
    }
 
