@@ -133,6 +133,18 @@ BigInteger::BigInteger(std::string s){
       }
    }
 
+   digits.moveFront();
+
+
+   while ((digits.length() > 1) && (digits.peekNext() == 0)){
+
+      
+      digits.eraseAfter();
+      
+   }
+
+
+
 
 
 
@@ -495,7 +507,7 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       //cout << "N.digits: " << N.digits << endl;
 
-      List scale = scalar(N.digits, B.digits.movePrev());
+      List scale = scalar(A.digits, B.digits.movePrev());
 
       //cout << "scalar: " << scale << endl;
 
@@ -528,6 +540,8 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 // will begin with a negative sign '-'. If this BigInteger is zero, the
 // returned string will consist of the character '0' only.
 std::string BigInteger::to_string() {
+
+   
 
 
    digits.moveFront();
