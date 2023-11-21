@@ -8,13 +8,16 @@ PA6*/
 #include"List.h"
 #include"BigInteger.h"
 
+#include <cmath>
+
 using namespace std;
 
 
 //CHANGE BEFORE SUBMITTING
 
-const int base = 1000;
-const int power = 3;
+
+const int power = 9;
+const int base = std::pow(10, power);
 
 // Exported type  -------------------------------------------------------------
 
@@ -67,7 +70,7 @@ BigInteger::BigInteger(long x){
 // Pre: s is a non-empty string consisting of (at least one) base 10 digit
 // {0,1,2,3,4,5,6,7,8,9}, and an optional sign {+,-} prefix.
 BigInteger::BigInteger(std::string s){
-   
+
 
    digits = List();
 
@@ -82,12 +85,15 @@ BigInteger::BigInteger(std::string s){
    } 
 
    string::size_type plus_minus = s.substr(1, s.size()-1).find_first_not_of("0123456789"); 
+
+   
    if (plus_minus != std::string::npos) {
       throw std::invalid_argument("plus/minus must be in front");
    } 
 
    if (s[0] == '-'){
       signum=-1;
+      
    }
    else if (s[0] == '+'){
       signum=1;
@@ -104,44 +110,33 @@ BigInteger::BigInteger(std::string s){
       }
    }
 
-   // int firstDigits;
-   // int num_dig = 0;
-   // int index = 0;
 
-   // if (s[0] == '+' || s[0] == '-' ){
-   //    firstDigits = (s.size()-1)%power;
-   //    digits.insertBefore(stol(s.substr(1, firstDigits)));
-   //    digits.movePrev();
-   //    num_dig = s.size()-1-firstDigits;
-   //    index = 1;
-
-   // }
-   // else{
-   //    firstDigits = s.size()%power;
-   //    digits.insertBefore(stol(s.substr(0, firstDigits)));
-   //    digits.movePrev();
-   //    num_dig = s.size()-firstDigits;
-   //    index = 0;
-
-   // }
-
-   //int iterations = num_dig/power;
-
-   
    
    while (s.length() > 0){
+      
       if (s.length()>=power){
-         digits.insertAfter(stol(s.substr(s.length() - 3, power)));
-         //cout << stol(s.substr(s.length() - 3, power)) << endl;
-         s.erase(s.length() - 3, power);
+
+         digits.insertAfter(std::abs(stol(s.substr(s.length() - power, power))));
+         s.erase(s.length() - power, power);
 
       }
       else{
-         digits.insertAfter(stol(s));
+
+         string::size_type checksign = s.find_first_not_of("+-"); 
+   
+         if (checksign != std::string::npos) {
+            digits.insertAfter(std::abs(stol(s)));
+         } 
+         
          // << stol(s) << endl;
          s.erase();
       }
    }
+
+
+
+
+   
 
    
 
@@ -261,6 +256,100 @@ void BigInteger::negate(){
 
 // BigInteger Arithmetic operations ----------------------------------------
 
+void negateList(List& digits){
+
+   digits.moveFront();
+
+   for (int i = 0; i < digits.length() ; i++){
+      digits.setAfter(-(digits.peekNext()));
+      digits.moveNext();
+   }
+   
+}
+
+
+
+int normalize(List& digits){
+
+
+   if (digits.length() == 0){
+      return 0;
+   }
+
+   digits.moveFront();
+
+
+   while ((digits.length() >= 1) && (digits.peekNext() == 0) ){
+      digits.eraseAfter();
+   }
+
+
+
+   if (digits.length() == 0){
+      return 0;
+   }
+
+   int sign = 0;
+
+   if (digits.front() < 0){
+
+      negateList(digits);
+      sign =  -1;
+   }
+   else if (digits.front() > 0){
+
+      sign =  1;
+   }
+
+   int len = digits.length();
+
+
+   digits.moveBack();
+
+   ListElement carry = 0;
+
+   for (int x = 0; x < len; x ++){
+
+      ListElement data = digits.movePrev();
+
+      data += carry;
+      
+   
+      
+      if (data < 0){
+         
+         
+         carry = -1;
+         data += base;
+
+
+      }
+
+      if (data >= base){
+         carry = data / base;
+         data -= carry * base;
+      }
+
+      digits.setAfter(data);
+
+   }
+
+
+
+   digits.moveFront();
+
+
+
+   if (carry != 0){
+      digits.insertBefore(carry);
+   }
+
+   return sign;
+
+
+
+}
+
 
 
 
@@ -269,13 +358,15 @@ void BigInteger::negate(){
 // Returns a BigInteger representing the sum of this and N.
 BigInteger BigInteger::add(const BigInteger& N) const{
 
+   
+
 
 
    BigInteger A = *this;
    BigInteger B = N;
 
-   cout << A << endl;
-   cout << B << endl;
+   
+
 
    List LA = A.digits;
    List LB = B.digits;
@@ -295,6 +386,8 @@ BigInteger BigInteger::add(const BigInteger& N) const{
       
    }
 
+   
+
    LA.moveBack();
    LB.moveBack();
 
@@ -302,106 +395,30 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 
    long sum;
 
+   
+
    for (int i = 0; i < LA.length(); i ++){
-
-      sum = (A.sign() * LA.peekPrev()) + (B.sign() * LB.peekPrev());
+      
+      sum = (A.sign() * LA.movePrev()) + (B.sign() * LB.movePrev());
+      
       C.digits.insertAfter(sum);
-      LA.movePrev();
-      LB.movePrev();
-
 
    }
-
-
-   cout << LA << endl;
-   cout << LB << endl;
-   cout << C.digits << endl;
-   
 
 
    //NORMALIZE
 
-   if (C.digits.length() == 0){
-      C.signum = 0;
-      return C;
-   }
 
-   C.digits.moveFront();
 
-   while (C.digits.peekNext() == 0){
-
-      C.digits.eraseAfter();
-   }
+   C.signum = normalize(C.digits);
 
    if (C.digits.length() == 0){
-      C.signum = 0;
-      return C;
-   }
+      C.digits.insertBefore(0);
 
-   if (C.digits.front() < 0){
-      C.signum = -1;
-   }
-   else if (C.digits.front() > 0){
-      //cout << "positive" << endl;
-
-      C.signum = 1;
-   }
-
-   int len = C.digits.length();
-
-
-   C.digits.moveBack();
-
-   ListElement carry = 0;
-
-   for (int x = 0; x < len; x ++){
-
-      ListElement data = C.digits.peekPrev() + carry;
-      C.digits.setBefore(data);
-      C.digits.movePrev();
-      carry = 0;
-      
-      
-      if (data < 0){
-         carry = data/base - 1;
-         data -= carry + base;
-         C.digits.setAfter(data);
-
-
-         if (x == len - 1){
-            
-            C.digits.insertAfter(carry);
-            C.digits.moveFront();
-         }
-      }
-
-      if (data >= base){
-         
-         carry = data / base;
-         data -= base;
-         C.digits.setAfter(data);
-        
-         if (x == len - 1 ){
-
-            C.digits.insertAfter(carry);
-            C.digits.moveFront();
-
-            //cout << C.digits << endl;
-
-            return C;
-         }
-      }
-
-      
 
    }
 
-   cout << C << endl;
-
-
-   return N;
-
-
+   return C;
 
 }
 
@@ -411,13 +428,27 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const{
 
-   return N;
+
+
+   BigInteger A = *this;
+   BigInteger B = N;
+
+ 
+
+   B.negate();
+
+   BigInteger subVal = A.add(B);
+
+
+   return subVal;
 
 }
 
 // mult()
 // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const{
+
+
 
    List one = digits;
    List list_n = N.digits;
@@ -437,36 +468,45 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
    }
 
    list_n.moveBack();
-
-
+   
    for (int x=0 ; x < list_n.length(); x++){
 
-      ListElement mult = list_n.peekPrev();
-      list_n.movePrev();
+      ListElement mult = list_n.movePrev();
+      
+      list_this.moveFront();
 
       for (int y = 0; y < list_this.length(); y ++){
+
          ListElement sum = mult * list_this.moveNext();
          list_this.setBefore(sum);
+
       }
 
-      list_this.moveBack();
+      cout << list_this << endl;
 
+      list_this.moveBack();
 
       for (int y = 0; y < x; y ++){
          list_this.insertAfter(0);
 
       }
 
+      cout << list_this << endl;
+
       List holder = List();
 
       list_this.moveFront();
       i.digits.moveFront();
+
 
       while (list_this.length() > i.digits.length()){
 
          i.digits.insertBefore(0);
 
       }
+
+      
+
       while (list_this.length() < i.digits.length()){
 
          list_this.insertBefore(0);
@@ -478,21 +518,20 @@ BigInteger BigInteger::mult(const BigInteger& N) const{
 
       for (int b = 0; b < list_this.length(); b ++){
 
-         ListElement sum = i.digits.peekPrev() + list_this.peekPrev();
-         i.digits.movePrev();
-         list_this.movePrev();
+         ListElement sum = i.digits.movePrev() + list_this.movePrev();
 
          holder.insertAfter(sum);
 
       }
 
-      //normalize(holder)
+      //cout << "before normalize: " << holder << endl;
+      normalize(holder);
+      //cout << "after normalize: " << holder << endl;
       i.digits = holder;
 
-
-
-
    }
+
+
 
    return i;
 
@@ -514,6 +553,10 @@ std::string BigInteger::to_string() {
 
    std::string s = "";
 
+   if (sign() == -1){
+      s += '-';
+   }
+
    
     
    while (digits.position() < digits.length()){
@@ -523,6 +566,8 @@ std::string BigInteger::to_string() {
       if (std::to_string(digits.peekNext()).size() < power){
 
          if (digits.position() > 0){
+
+            
    
             count = power - std::to_string(digits.peekNext()).size();
 
@@ -535,6 +580,7 @@ std::string BigInteger::to_string() {
       }
       
       s += std::to_string(digits.peekNext());
+      //s += ".....";
       digits.moveNext();
  
    } 
@@ -557,10 +603,8 @@ std::ostream& operator<<( std::ostream& stream, BigInteger N ){
 // Returns true if and only if A equals B. 
 bool operator==( const BigInteger& A, const BigInteger& B ){
 
-   //cout << "hi" << endl;
 
    if (A.compare(B) == 0){
-      //cout << "hhi" << endl;
       return true;
    }
 
@@ -629,6 +673,8 @@ BigInteger operator+( const BigInteger& A, const BigInteger& B ){
 // operator+=()
 // Overwrites A with the sum A+B. 
 BigInteger operator+=( BigInteger& A, const BigInteger& B ){
+
+   A = A.add(B);
    return A;
 
 }
@@ -636,7 +682,9 @@ BigInteger operator+=( BigInteger& A, const BigInteger& B ){
 // operator-()
 // Returns the difference A-B. 
 BigInteger operator-( const BigInteger& A, const BigInteger& B ){
-   return A;
+
+   
+   return A.sub(B);
 
 }
 
@@ -645,6 +693,7 @@ BigInteger operator-( const BigInteger& A, const BigInteger& B ){
 // operator-=()
 // Overwrites A with the difference A-B. 
 BigInteger operator-=( BigInteger& A, const BigInteger& B ){
+   A = A.sub(B);
    return A;
 
 }
@@ -655,7 +704,7 @@ BigInteger operator-=( BigInteger& A, const BigInteger& B ){
 // Returns the product A*B. 
 BigInteger operator*( const BigInteger& A, const BigInteger& B ){
 
-   return A;
+   return A.mult(B);
 
 }
 
@@ -665,6 +714,7 @@ BigInteger operator*( const BigInteger& A, const BigInteger& B ){
 // Overwrites A with the product A*B. 
 BigInteger operator*=( BigInteger& A, const BigInteger& B ){
 
+   A = A.mult(B);
    return A;
 
 }
