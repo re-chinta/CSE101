@@ -290,7 +290,6 @@ int normalize(List& digits){
    }
 
 
-
    if (digits.length() == 0){
       return 0;
    }
@@ -341,9 +340,7 @@ int normalize(List& digits){
    }
 
 
-
    digits.moveFront();
-
 
 
    if (carry != 0){
@@ -352,30 +349,11 @@ int normalize(List& digits){
 
    return sign;
 
-
-
 }
 
-
-
-
-
-// add()
-// Returns a BigInteger representing the sum of this and N.
-BigInteger BigInteger::add(const BigInteger& N) const{
+void sumList(List& LA, List& LB, List& digits, int signA, int signB){
 
    
-
-
-
-   BigInteger A = *this;
-   BigInteger B = N;
-
-   
-
-
-   List LA = A.digits;
-   List LB = B.digits;
 
    LA.moveFront();
    LB.moveFront();
@@ -391,25 +369,50 @@ BigInteger BigInteger::add(const BigInteger& N) const{
       LA.insertBefore(0);
       
    }
-
    
 
    LA.moveBack();
    LB.moveBack();
 
-   BigInteger C = BigInteger();
-
+   
    long sum;
 
-   
+   if (digits.length() > 0){
+      digits.clear();
+   }
+
 
    for (int i = 0; i < LA.length(); i ++){
       
-      sum = (A.sign() * LA.movePrev()) + (B.sign() * LB.movePrev());
+      sum = (signA * LA.movePrev()) + (signB * LB.movePrev());
       
-      C.digits.insertAfter(sum);
+      digits.insertAfter(sum);
 
    }
+
+}
+
+
+
+
+// add()
+// Returns a BigInteger representing the sum of this and N.
+BigInteger BigInteger::add(const BigInteger& N) const{
+
+
+   BigInteger A = *this;
+   BigInteger B = N;
+
+   BigInteger C = BigInteger();
+
+   
+
+   List LA = A.digits;
+   List LB = B.digits;
+
+   sumList(LA, LB, C.digits, A.sign(), B.sign());
+
+
 
 
    //NORMALIZE
@@ -420,8 +423,6 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 
    if (C.digits.length() == 0){
       C.digits.insertBefore(0);
-
-
    }
 
    return C;
@@ -429,17 +430,12 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 }
 
 
-
 // sub()
 // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const{
 
-
-
    BigInteger A = *this;
    BigInteger B = N;
-
- 
 
    B.negate();
 
@@ -450,97 +446,74 @@ BigInteger BigInteger::sub(const BigInteger& N) const{
 
 }
 
+
+void shift(List& digits, int p){
+   digits.moveBack();
+   for (int i = 0; i < p; i ++){
+      digits.insertAfter(0);
+   }
+}
+
+List scalar(List L, long s){
+
+   cout << L <<endl;
+   cout << s <<endl;
+   List digits = L;
+   digits.moveFront();
+   for (int i = 0; i < digits.length(); i ++){
+      digits.setAfter(s * digits.peekNext());
+      digits.moveNext();
+   }
+   return digits;
+}
+
 // mult()
 // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const{
 
+   BigInteger total = BigInteger();
 
-
-   List one = digits;
-   List list_n = N.digits;
-   List list_this = digits;
-
-
-   BigInteger i = BigInteger();
+   BigInteger A = *this;
+   BigInteger B = N;
 
    if (sign() == 0 || N.sign() == 0){
-      return i;
+      return total;
    }
    if (sign() != N.sign()){
-      i.signum = -1;
+      total.signum = -1;
    } 
    else{
-      i.signum = 1;
-   }
-
-   list_n.moveBack();
-   
-   for (int x=0 ; x < list_n.length(); x++){
-
-      ListElement mult = list_n.movePrev();
-      
-      list_this.moveFront();
-
-      for (int y = 0; y < list_this.length(); y ++){
-
-         ListElement sum = mult * list_this.moveNext();
-         list_this.setBefore(sum);
-
-      }
-
-     
-
-      list_this.moveBack();
-
-      for (int y = 0; y < x; y ++){
-         list_this.insertAfter(0);
-
-      }
-
-
-
-      List holder = List();
-
-      list_this.moveFront();
-      i.digits.moveFront();
-
-
-      while (list_this.length() > i.digits.length()){
-
-         i.digits.insertBefore(0);
-
-      }
-
-      
-
-      while (list_this.length() < i.digits.length()){
-
-         list_this.insertBefore(0);
-
-      }
-
-      list_this.moveBack();
-      i.digits.moveBack();
-
-      for (int b = 0; b < list_this.length(); b ++){
-
-         ListElement sum = i.digits.movePrev() + list_this.movePrev();
-
-         holder.insertAfter(sum);
-
-      }
-
-      
-      normalize(holder);
-    
-      i.digits = holder;
-
+      total.signum = 1;
    }
 
 
+   B.digits.moveBack();
+   List running_sum = List();
 
-   return i;
 
+   for (int i = 0; i < B.digits.length(); i++){
+
+      cout << "N.digits: " << N.digits << endl;
+
+      List scale = scalar(N.digits, B.digits.movePrev());
+
+      cout << "scalar: " << scale << endl;
+
+      shift(scale, i);
+
+      List sum_copy = running_sum;
+
+      sumList(scale, sum_copy, running_sum, 1, 1);
+
+      normalize(running_sum);
+
+      cout << running_sum << endl;
+
+   }
+
+   total.digits = running_sum;
+
+   return total;
 
 }
 
