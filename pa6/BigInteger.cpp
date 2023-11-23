@@ -55,13 +55,22 @@ BigInteger::BigInteger(long x){
    x = abs(x);
 
 
-   while (x > base){
+   do{
+
+      
 
       digits.insertBefore(x % base);
       digits.movePrev();
       x = x / base;
       
+   } while (x > base);
+
+   if (signum == 0){
+      digits.clear();
    }
+
+   
+   
 
 }
 
@@ -136,12 +145,11 @@ BigInteger::BigInteger(std::string s){
    digits.moveFront();
 
 
-   while ((digits.length() > 1) && (digits.peekNext() == 0)){
-
-      
+   while ((digits.length() > 0) && (digits.peekNext() == 0)){
       digits.eraseAfter();
       
    }
+   
 
 
 
@@ -433,9 +441,7 @@ BigInteger BigInteger::add(const BigInteger& N) const{
 
    C.signum = normalize(C.digits);
 
-   if (C.digits.length() == 0){
-      C.digits.insertBefore(0);
-   }
+   
 
    return C;
 
@@ -579,6 +585,11 @@ std::string BigInteger::to_string() {
       digits.moveNext();
  
    } 
+   
+   if (sign() == 0){
+      s+="0";
+
+   }
    return s;
    
 }
