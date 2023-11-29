@@ -20,8 +20,6 @@ Dictionary::Node::Node(keyType k, valType v){
 }
 
 
-
-
 // Helper Functions (Optional) ---------------------------------------------
 
 // inOrderString()
@@ -45,7 +43,7 @@ void Dictionary::inOrderString(std::string& s, Node* R) const{
 void Dictionary::preOrderString(std::string& s, Node* R) const{
 
     if (R != nil){
-        s.append(R->key + " : "+ std::to_string(R->val));
+        s.append(R->key + "\n");
         preOrderString(s, R->left);
         preOrderString(s, R->right);
     }
@@ -185,7 +183,7 @@ void Dictionary::transplant(Node* u, Node* v){
 
 
 Dictionary::Dictionary(){
-    nil = new Node("NIL", 0);
+    nil = new Node("\0\0", 0);
     root = nil;
     current = nil;
     num_pairs = 0;
@@ -193,6 +191,12 @@ Dictionary::Dictionary(){
 
 // Copy constructor.
 Dictionary::Dictionary(const Dictionary& D){
+
+    nil = new Node("\0\0", 0);
+    root = nil;
+    current = nil;
+    num_pairs = 0;
+
     preOrderCopy(D.root, D.nil);
 }
 
@@ -227,6 +231,11 @@ bool Dictionary::contains(keyType k) const{
 // Pre: contains(k)
 valType& Dictionary::getValue(keyType k) const{
 
+    if (!contains(k)){
+
+        throw std::logic_error("getValue error");
+
+    }
     
     return search(root, k)->val;
     
@@ -250,6 +259,10 @@ bool Dictionary::hasCurrent() const{
 // Pre: hasCurrent() 
 keyType Dictionary::currentKey() const{
 
+    if (!hasCurrent()){
+        throw std::logic_error("currentKey error");
+    }
+
     return current->key;
 
 }
@@ -258,6 +271,11 @@ keyType Dictionary::currentKey() const{
 // Returns a reference to the current value.
 // Pre: hasCurrent()
 valType& Dictionary::currentVal() const{
+    if (!hasCurrent()){
+
+        throw std::logic_error("currentVal error");
+
+    }
 
     return current->val; 
 
@@ -271,6 +289,8 @@ valType& Dictionary::currentVal() const{
 void Dictionary::clear(){
 
     postOrderDelete(root);
+    current = nil;
+    num_pairs = 0;
 
 }
 
@@ -279,31 +299,35 @@ void Dictionary::clear(){
 // otherwise inserts the new pair (k, v).
 void Dictionary::setValue(keyType k, valType v){
 
-    if (contains(k)){
-        search(root, k) -> val = v;
-        cout << "checking" << endl;
-    }
+    // if (contains(k)){
+    //     search(root, k) -> val = v;
+    // }
     
-    else{
+    // else{
         
-        Node* z = new Node(k, v);
+        
         
         Node* y = nil;
         Node* x = root;
         while (x != nil){
             y = x;
-            if (z->key < x->key){
+            if (k < x->key){
                 x = x->left;
+            }
+            else if (k == x->key){
+                x -> val = v;
+                return;
             }
             else {
                 x = x->right;
             }
         }
-        
+
+        Node* z = new Node(k, v);
+
         z->parent = y;
         z->left = nil;
         z->right = nil;
-
 
         if (y == nil ){ // T was empty
             root = z;
@@ -314,8 +338,9 @@ void Dictionary::setValue(keyType k, valType v){
         else {
             y->right = z;
          } 
-    }
-    //cout << "hliu" << endl;
+
+        num_pairs++;
+    //}
 
 }
 
@@ -324,6 +349,14 @@ void Dictionary::setValue(keyType k, valType v){
 // becomes undefined.
 // Pre: contains(k).
 void Dictionary::remove(keyType k){
+
+    if (!contains(k)){
+
+        throw std::logic_error("remove error");
+
+    }
+
+
 
 
     Node* z = search(root, k);
@@ -350,6 +383,8 @@ void Dictionary::remove(keyType k){
         y->left = z->left;
         y->left->parent = y;
     }
+
+    num_pairs--;
 
 
 }
@@ -383,6 +418,12 @@ void Dictionary::end(){
 // Pre: hasCurrent()
 void Dictionary::next(){
 
+    if (!hasCurrent()){
+
+        throw std::logic_error("next error");
+
+    }
+
     if (current != findMax(root)){
         current = findNext(current);
     }
@@ -399,6 +440,12 @@ void Dictionary::next(){
 // the current iterator is at the first pair, makes current undefined.
 // Pre: hasCurrent()
 void Dictionary::prev(){
+
+    if (!hasCurrent()){
+
+        throw std::logic_error("prev error");
+
+    }
 
     if (current != findMin(root)){
         current = findPrev(current);
@@ -488,9 +535,11 @@ Dictionary& Dictionary::operator=( const Dictionary& D ){
 
         Dictionary temp = D;
 
+        std::swap(nil, temp.nil);
+
         std::swap(root, temp.root);
         std::swap(current, temp.current);
-        std::swap(nil, temp.nil);
+        
         std::swap(num_pairs, temp.num_pairs);
     
     }
