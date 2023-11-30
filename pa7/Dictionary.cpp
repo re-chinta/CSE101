@@ -73,6 +73,7 @@ void Dictionary::postOrderDelete(Node* R){
         postOrderDelete(R->left);
         postOrderDelete(R->right);
         delete R;
+        //delete nil;
     }
 
 }
@@ -82,7 +83,7 @@ void Dictionary::postOrderDelete(Node* R){
 // the address of the Node if it exists, returns nil otherwise.
 Dictionary::Node* Dictionary::search(Node* R, keyType k) const{
 
-    if( R == nil or k == R->key){
+    if( R == nil || k == R->key){
          return R;
     }
      
@@ -203,6 +204,7 @@ Dictionary::Dictionary(const Dictionary& D){
 // Destructor
 Dictionary::~Dictionary(){
     postOrderDelete(root);
+    delete nil;
 }
 
 
@@ -290,6 +292,7 @@ void Dictionary::clear(){
 
     postOrderDelete(root);
     current = nil;
+    root = nil;
     num_pairs = 0;
 
 }
@@ -298,14 +301,6 @@ void Dictionary::clear(){
 // If a pair with key==k exists, overwrites the corresponding value with v, 
 // otherwise inserts the new pair (k, v).
 void Dictionary::setValue(keyType k, valType v){
-
-    // if (contains(k)){
-    //     search(root, k) -> val = v;
-    // }
-    
-    // else{
-        
-        
         
         Node* y = nil;
         Node* x = root;
@@ -356,9 +351,6 @@ void Dictionary::remove(keyType k){
 
     }
 
-
-
-
     Node* z = search(root, k);
 
     if(z == current){
@@ -382,7 +374,10 @@ void Dictionary::remove(keyType k){
         transplant(z, y);
         y->left = z->left;
         y->left->parent = y;
+        
     }
+
+    delete z;
 
     num_pairs--;
 
