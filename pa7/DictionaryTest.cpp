@@ -1,3 +1,7 @@
+/*Reema Chintala  
+rechinta  
+PA7*/  
+
 //-----------------------------------------------------------------------------
 // DictionaryClient.cpp
 // A test client for the Dictionary ADT
