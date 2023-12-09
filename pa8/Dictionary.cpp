@@ -2,8 +2,8 @@
 rechinta
 PA8*/
 
-#define RED 0
-#define BLACK 1
+#define RED 1
+#define BLACK 0
 
 #include "Dictionary.h"
 #include <iostream>
@@ -22,6 +22,8 @@ Dictionary::Node::Node(keyType k, valType v) {
 
   color = BLACK;
 }
+
+
 
 // RBT Helper Functions (Optional) -----------------------------------------
 
@@ -137,7 +139,7 @@ void Dictionary::RB_DeleteFixUp(Node *N) {
 
   while (N != root and N->color == BLACK) {
     if (N == N->parent->left) {
-      Node* w = N->parent->right;
+      Node *w = N->parent->right;
       if (w->color == RED) {
         w->color = BLACK;       // case 1
         N->parent->color = RED; // case 1
@@ -163,7 +165,7 @@ void Dictionary::RB_DeleteFixUp(Node *N) {
       }
     } // case 4
     else {
-      Node* w = N->parent->left;
+      Node *w = N->parent->left;
       if (w->color == RED) {
         w->color = BLACK;       // case 5
         N->parent->color = RED; // case 5
@@ -194,37 +196,34 @@ void Dictionary::RB_DeleteFixUp(Node *N) {
 
 // RB_Delete()
 void Dictionary::RB_Delete(Node *N) {
-    Node* y = N;
-    Node* x;
-    int y_original_color = y->color;
-    if (N->left == nil){
-      x= N->right;
-      RB_Transplant( N, N->right);
-      }
-    else if (N->right == nil){
-      x =  N->left;
-      RB_Transplant( N, N->left);
-      }
-    else {
-      y = findMin(N->right);
-      y_original_color = y->color;
-      x  = y->right;
-      if( y->parent == N){
-         x->parent = y;
-        }
-      else {
-         RB_Transplant( y, y->right);
-         y->right = N->right;
-         y->right->parent = y;
-        }
-      RB_Transplant(N, y);
-      y->left = N->left;
-      y->left->parent = y;
-      y->color = N->color;
+  Node *y = N;
+  Node *x;
+  int y_original_color = y->color;
+  if (N->left == nil) {
+    x = N->right;
+    RB_Transplant(N, N->right);
+  } else if (N->right == nil) {
+    x = N->left;
+    RB_Transplant(N, N->left);
+  } else {
+    y = findMin(N->right);
+    y_original_color = y->color;
+    x = y->right;
+    if (y->parent == N) {
+      x->parent = y;
+    } else {
+      RB_Transplant(y, y->right);
+      y->right = N->right;
+      y->right->parent = y;
     }
-   if (y_original_color == BLACK){
-      RB_DeleteFixUp(x);
-    }
+    RB_Transplant(N, y);
+    y->left = N->left;
+    y->left->parent = y;
+    y->color = N->color;
+  }
+  if (y_original_color == BLACK) {
+    RB_DeleteFixUp(x);
+  }
 }
 
 // Helper Functions (Optional) ---------------------------------------------
@@ -251,10 +250,47 @@ void Dictionary::inOrderString(std::string &s, Node *R) const {
 void Dictionary::preOrderString(std::string &s, Node *R) const {
 
   if (R != nil) {
-    s.append(R->key + "\n");
+    s.append(R->key);
+    if (R->color == RED) {
+
+      s.append(" (RED)");
+    }
+
+    s.append("\n");
+
     preOrderString(s, R->left);
     preOrderString(s, R->right);
   }
+}
+
+// BST_insert()
+// Inserts a copy of the Node *M into this Dictionary. Used by preOrderCopy().
+void Dictionary::BST_insert(Node *M){
+
+  Node* z = new Node(M->key, M->val);
+   Node* y = nil;
+   Node* x = root;
+   while (x != nil){
+      y = x;
+      if( M->key < x->key){
+         x = x->left;}
+      else {
+
+         x = x->right;}
+        }
+   z->parent = y;
+   if (y == nil){
+      root = z;}
+   else if( M->key < y->key){
+      y->left = z;}
+   else {
+      y->right = z;}
+   z->left = nil;
+   z->right = nil;
+
+  z->color = M->color;
+  num_pairs++;
+
 }
 
 // preOrderCopy()
@@ -262,9 +298,11 @@ void Dictionary::preOrderString(std::string &s, Node *R) const {
 // Dictionary. Recursion terminates at N.
 void Dictionary::preOrderCopy(Node *R, Node *N) {
 
-  if (R != N && R != nil) {
+  if (R != N) {
 
-    setValue(R->key, R->val);
+    BST_insert(R);
+
+    //setValue(R->key, R->val);
 
     preOrderCopy(R->left, N);
     preOrderCopy(R->right, N);
@@ -370,6 +408,10 @@ Dictionary::Dictionary() {
   root = nil;
   current = nil;
   num_pairs = 0;
+
+  nil-> left = nil;
+   nil-> right = nil;
+    nil-> parent = nil;
 }
 
 // Copy constructor.
@@ -378,6 +420,9 @@ Dictionary::Dictionary(const Dictionary &D) {
   nil = new Node("\0\0", 0);
   root = nil;
   current = nil;
+  nil-> left = nil;
+   nil-> right = nil;
+    nil-> parent = nil;
   num_pairs = 0;
 
   preOrderCopy(D.root, D.nil);
@@ -471,6 +516,7 @@ void Dictionary::clear() {
 // otherwise inserts the new pair (k, v).
 void Dictionary::setValue(keyType k, valType v) {
 
+
   Node *y = nil;
   Node *x = root;
   while (x != nil) {
@@ -499,10 +545,14 @@ void Dictionary::setValue(keyType k, valType v) {
     y->right = z;
   }
 
+  z->color = RED;
+
   RB_InsertFixUp(z);
 
   num_pairs++;
 }
+
+
 
 // remove()
 // Deletes the pair for which key==k. If that pair is current, then current
