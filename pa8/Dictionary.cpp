@@ -25,7 +25,7 @@ Dictionary::Node::Node(keyType k, valType v) {
 
 
 
-// RBT Helper Functions (Optional) -----------------------------------------
+// RBT Helper Functions (Optional)  -----------------------------------------
 
 // LeftRotate()
 void Dictionary::LeftRotate(Node *N) {
