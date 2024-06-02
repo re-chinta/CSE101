@@ -1,0 +1,7 @@
+- README.md 
+- Makefile - compiles all the files
+- Dictionary.h - header file for dictionary ADT
+- Dictionary.cpp - Dictionary module. Stores key and value using a RB tree. Can print out all elements along with other functionality
+- DictionaryTest.cpp - tests Dictionary module
+- Order.cpp - Client for dictionary module
+- WordFrequency.cpp - client 2 for dictionary module. counts the occurances of each word in a file
